@@ -2,20 +2,23 @@
 
 import * as React from "react";
 import {
-  Grid,
   Paper,
   Typography,
   Box,
   Card,
   CardContent,
   Button,
-  Avatar,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Divider,
+  Avatar,
 } from "@mui/material";
+
+// SOLUSI: Gunakan Import langsung ke file komponen untuk menghindari error tipe
+import Grid from "@mui/material/Grid";
+
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 import ClassIcon from "@mui/icons-material/Class";
 import PendingActionsIcon from "@mui/icons-material/PendingActions";
@@ -25,7 +28,6 @@ import Link from "next/link";
 export default function DashboardPage() {
   return (
     <Box>
-      {/* 1. Judul Halaman */}
       <Typography
         variant="h4"
         gutterBottom
@@ -37,10 +39,10 @@ export default function DashboardPage() {
         Selamat datang di Sistem Informasi Data Peserta Diklat.
       </Typography>
 
-      {/* 2. Kartu Statistik (Grid System) */}
+      {/* Grid Container */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* Kartu 1: Total Peserta */}
-        <Grid item xs={12} md={4}>
+        {/* Item 1 */}
+        <Grid size={8}>
           <Card
             sx={{ height: "100%", borderLeft: "5px solid #1976d2" }}
             elevation={2}
@@ -67,8 +69,8 @@ export default function DashboardPage() {
           </Card>
         </Grid>
 
-        {/* Kartu 2: Diklat Aktif */}
-        <Grid item xs={12} md={4}>
+        {/* Item 2 */}
+        <Grid size={8}>
           <Card
             sx={{ height: "100%", borderLeft: "5px solid #2e7d32" }}
             elevation={2}
@@ -95,8 +97,8 @@ export default function DashboardPage() {
           </Card>
         </Grid>
 
-        {/* Kartu 3: Menunggu Verifikasi */}
-        <Grid item xs={12} md={4}>
+        {/* Item 3 */}
+        <Grid size={8}>
           <Card
             sx={{ height: "100%", borderLeft: "5px solid #ed6c02" }}
             elevation={2}
@@ -124,10 +126,10 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
-      {/* 3. Area Konten Bawah (Grid 2 Kolom) */}
+      {/* Bagian Bawah */}
       <Grid container spacing={3}>
-        {/* Kolom Kiri: Akses Cepat */}
-        <Grid item xs={12} md={8}>
+        {/* Kolom Kiri */}
+        <Grid size={8}>
           <Paper elevation={2} sx={{ p: 3, height: "100%" }}>
             <Typography variant="h6" gutterBottom fontWeight="bold">
               Akses Cepat
@@ -150,8 +152,8 @@ export default function DashboardPage() {
           </Paper>
         </Grid>
 
-        {/* Kolom Kanan: Aktivitas Terbaru (List) */}
-        <Grid item xs={12} md={4}>
+        {/* Kolom Kanan */}
+        <Grid size={8}>
           <Paper elevation={2} sx={{ p: 0, height: "100%" }}>
             <Box sx={{ p: 2, borderBottom: "1px solid #eee" }}>
               <Typography variant="h6" fontWeight="bold">
