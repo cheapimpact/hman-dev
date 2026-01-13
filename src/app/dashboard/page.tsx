@@ -167,6 +167,8 @@ function StatCard({
           xAxis={[
             { data: [1, 2, 3, 4, 5], scaleType: "point", hideTooltip: true },
           ]}
+          leftAxis={null}
+          bottomAxis={null}
           margin={{ top: 5, bottom: 0, left: 0, right: 0 }}
           sx={{ ".MuiAreaElement-root": { fillOpacity: 0.1 } }} // Transparansi area
         />
@@ -456,6 +458,7 @@ export default function MuiDashboardPage() {
                       {
                         data: [35, 44, 24, 34, 50, 10, 5],
                         color: "#3399FF",
+                        borderRadius: 4,
                       },
                     ]}
                     xAxis={[
@@ -465,6 +468,7 @@ export default function MuiDashboardPage() {
                         categoryGapRatio: 0.4,
                       },
                     ]}
+                    leftAxis={null} // Hilangkan sumbu Y agar bersih
                     margin={{ top: 10, bottom: 20, left: 0, right: 0 }}
                   />
                 </Box>
