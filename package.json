@@ -15,11 +15,17 @@
     "@mui/icons-material": "latest",
     "@mui/material": "latest",
     "@mui/material-nextjs": "latest",
+    "@mui/x-charts": "^8.24.0",
+    "add": "^2.0.6",
+    "better-sqlite3": "^12.6.0",
     "next": "^16.0.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "xlsx": "^0.18.5",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
