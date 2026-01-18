@@ -1,6 +1,7 @@
 "use client";
 
 import CircleIcon from "@mui/icons-material/Circle";
+import DatabaseIcon from "@mui/icons-material/Storage";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
@@ -243,22 +244,37 @@ export default function MuiDashboardPage() {
       <Box sx={{ p: 3, minHeight: "100vh" }}>
         <Grid container spacing={3}>
           {/* === KOLOM KIRI (UTAMA) === */}
-          <Grid size={{ xs: 6, md: 6, lg: 6 }}>
-            <Box>
-              <ActivityAccordion />
-            </Box>
-          </Grid>
-          <Grid size={{ xs: 6, md: 6, lg: 6 }}>
-            <Box>
-              <ActivityAccordion />
-            </Box>
-          </Grid>
           <Grid size={{ xs: 8, md: 8, lg: 8 }}>
-            <Stack
-              direction="row"
-              spacing={3}
-              sx={{ xs: 12, md: 12, height: "100%" }}
-            >
+            <Box>
+              <ActivityAccordion />
+            </Box>
+          </Grid>
+          <Grid size={{ xs: 4, md: 4, lg: 4 }}>
+            <Stack spacing={3}>
+              <Paper
+                sx={{
+                  p: 3,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                }}
+              >
+                <Typography variant="body1" fontWeight="bold" gutterBottom>
+                  Server
+                </Typography>
+                <Box
+                  sx={{ width: "100%", height: "100%", position: "relative" }}
+                >
+                  <DatabaseIcon sx={{ fontSize: 50 }} />
+
+                  <Typography variant="h6">{Date.now().toString()}</Typography>
+                </Box>
+              </Paper>
+            </Stack>
+          </Grid>
+          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+            <Stack direction="row" spacing={3} sx={{ height: "100%" }}>
               {/* 1. ROW ATAS: 3 KPI CARDS */}
               <Grid>
                 <StatCard
@@ -270,7 +286,7 @@ export default function MuiDashboardPage() {
               </Grid>
               <Grid>
                 <StatCard
-                  title="Sertifikat Terbit"
+                  title="Pelatihan Aktif"
                   value="325k"
                   color="#00C49F"
                   data={[20, 18, 25, 22, 30]}
@@ -278,60 +294,62 @@ export default function MuiDashboardPage() {
               </Grid>
               <Grid>
                 <StatCard
-                  title="Diklat Aktif"
+                  title="Kegiatan Aktif"
                   value="200k"
                   color="#FFBB28"
                   data={[5, 8, 12, 10, 15]}
                 />
               </Grid>
+              <Grid>
+                <Stack spacing={3}>
+                  <Paper
+                    sx={{
+                      p: 3,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Typography variant="body1" fontWeight="bold" gutterBottom>
+                      Target Realisasi Anggaran
+                    </Typography>
+                    <Box
+                      sx={{ width: "100%", height: 150, position: "relative" }}
+                    >
+                      <Gauge
+                        value={75}
+                        startAngle={-110}
+                        endAngle={110}
+                        sx={{
+                          [`& .${gaugeClasses.valueText}`]: {
+                            fontSize: 24,
+                            transform: "translate(0px, 0px)",
+                            fill: "#fff",
+                          },
+                          [`& .${gaugeClasses.valueArc}`]: {
+                            fill: "#3399FF",
+                          },
+                        }}
+                        text={({ value }) => `${value}%`}
+                      />
+                    </Box>
+                    <Stack direction="row" spacing={2} sx={{ mt: -2 }}>
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <CircleIcon sx={{ fontSize: 10, color: "#3399FF" }} />{" "}
+                        <Typography variant="caption">Terpakai</Typography>
+                      </Box>
+                      <Box display="flex" alignItems="center" gap={0.5}>
+                        <CircleIcon sx={{ fontSize: 10, color: "#2D3748" }} />{" "}
+                        <Typography variant="caption">Sisa</Typography>
+                      </Box>
+                    </Stack>
+                  </Paper>
+                </Stack>
+              </Grid>
             </Stack>
           </Grid>
 
-          <Grid size={{ xs: 4, md: 4 }}>
-            <Stack spacing={3}>
-              <Paper
-                sx={{
-                  p: 3,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <Typography variant="body1" fontWeight="bold" gutterBottom>
-                  Target Realisasi Anggaran
-                </Typography>
-                <Box sx={{ width: "100%", height: 150, position: "relative" }}>
-                  <Gauge
-                    value={75}
-                    startAngle={-110}
-                    endAngle={110}
-                    sx={{
-                      [`& .${gaugeClasses.valueText}`]: {
-                        fontSize: 24,
-                        transform: "translate(0px, 0px)",
-                        fill: "#fff",
-                      },
-                      [`& .${gaugeClasses.valueArc}`]: {
-                        fill: "#3399FF",
-                      },
-                    }}
-                    text={({ value }) => `${value}%`}
-                  />
-                </Box>
-                <Stack direction="row" spacing={2} sx={{ mt: -2 }}>
-                  <Box display="flex" alignItems="center" gap={0.5}>
-                    <CircleIcon sx={{ fontSize: 10, color: "#3399FF" }} />{" "}
-                    <Typography variant="caption">Terpakai</Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center" gap={0.5}>
-                    <CircleIcon sx={{ fontSize: 10, color: "#2D3748" }} />{" "}
-                    <Typography variant="caption">Sisa</Typography>
-                  </Box>
-                </Stack>
-              </Paper>
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+          <Stack direction="row" spacing={3} size={{ xs: 12, md: 12, lg: 12 }}>
             <Grid size={{ xs: 8, md: 8, lg: 8 }}>
               {/* 2. AREA TENGAH: GRAFIK BESAR (MAIN CHART) */}
               <Paper sx={{ p: 3, flexGrow: 1, minHeight: 400 }}>
@@ -451,7 +469,12 @@ export default function MuiDashboardPage() {
                 </Box>
               </Paper>
             </Grid>
-            <Grid size={{ xs: 4, md: 4, lg: 4 }}>
+            <Stack
+              direction="column"
+              size={{ xs: 4, md: 4, lg: 4 }}
+              spacing={1}
+              maxHeight="35%"
+            >
               {/* 2. BAR CHART HARIAN */}
               <Paper sx={{ p: 3 }}>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -486,8 +509,8 @@ export default function MuiDashboardPage() {
                 </Typography>
                 <HeatmapGrid />
               </Paper>
-            </Grid>
-          </Grid>
+            </Stack>
+          </Stack>
         </Grid>
       </Box>
     </ThemeProvider>
