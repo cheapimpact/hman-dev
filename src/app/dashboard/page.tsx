@@ -278,7 +278,7 @@ export default function MuiDashboardPage() {
               {/* 1. ROW ATAS: 3 KPI CARDS */}
               <Grid>
                 <StatCard
-                  title="Total Peserta"
+                  title="Total Pelatihan"
                   value="144k"
                   color="#3399FF"
                   data={[10, 15, 12, 20, 18]}
@@ -362,7 +362,7 @@ export default function MuiDashboardPage() {
                 >
                   <Box>
                     <Typography variant="h6">
-                      Statistik Peserta Tahunan
+                      Statistik Kegiatan Tahunan
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       Growth (+15%)
@@ -379,7 +379,7 @@ export default function MuiDashboardPage() {
                           20, 50, 80, 200, 300, 450, 400, 380, 500, 600, 550,
                           700,
                         ],
-                        label: "Peserta",
+                        label: "Pelatihan",
                         area: true,
                         showMark: false,
                         color: "#3399FF",
@@ -389,7 +389,7 @@ export default function MuiDashboardPage() {
                           10, 30, 40, 100, 150, 200, 220, 210, 300, 350, 320,
                           400,
                         ],
-                        label: "Lulus",
+                        label: "Lain-lain",
                         area: true,
                         showMark: false,
                         color: "#FFBB28",
@@ -416,11 +416,11 @@ export default function MuiDashboardPage() {
                     ]}
                     sx={{
                       ".MuiLineElement-root": { strokeWidth: 3 },
-                      ".MuiAreaElement-series-Peserta": {
-                        fill: "url('#gradientBlue')",
+                      ".MuiAreaElement-series-Pelatihan": {
+                        fill: "url('#gradientRed')",
                         fillOpacity: 0.3,
                       },
-                      ".MuiAreaElement-series-Lulus": {
+                      ".MuiAreaElement-series-Lain-lain": {
                         fill: "url('#gradientYellow')",
                         fillOpacity: 0.3,
                       },
@@ -469,24 +469,33 @@ export default function MuiDashboardPage() {
                 </Box>
               </Paper>
             </Grid>
-            <Stack
-              direction="column"
-              size={{ xs: 4, md: 4, lg: 4 }}
-              spacing={1}
-              maxHeight="35%"
-            >
-              {/* 2. BAR CHART HARIAN */}
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Peserta Login Harian
-                </Typography>
-                <Box sx={{ width: "100%", height: 200 }}>
+            <Grid size={{ xs: 4, md: 4, lg: 4 }}>
+              {/* 2. AREA TENGAH: GRAFIK BESAR (MAIN CHART) */}
+              <Paper sx={{ p: 3, flexGrow: 1, minHeight: 400 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    mb: 2,
+                  }}
+                >
+                  <Box>
+                    <Typography variant="h6">
+                      Statistik Kegiatan Mingguan
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Growth (+15%)
+                    </Typography>
+                  </Box>
+                  <Chip label="Tahun 2025" size="small" variant="outlined" />
+                </Box>
+
+                <Box sx={{ width: "100%", height: 350 }}>
                   <BarChart
                     series={[
                       {
                         data: [35, 44, 24, 34, 50, 10, 5],
                         color: "#3399FF",
-                        borderRadius: 4,
                       },
                     ]}
                     xAxis={[
@@ -496,20 +505,11 @@ export default function MuiDashboardPage() {
                         categoryGapRatio: 0.4,
                       },
                     ]}
-                    leftAxis={null} // Hilangkan sumbu Y agar bersih
                     margin={{ top: 10, bottom: 20, left: 0, right: 0 }}
                   />
                 </Box>
               </Paper>
-
-              {/* 3. HEATMAP (AKTIVITAS JAM) */}
-              <Paper sx={{ p: 3 }}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Waktu Akses Terpadat
-                </Typography>
-                <HeatmapGrid />
-              </Paper>
-            </Stack>
+            </Grid>
           </Stack>
         </Grid>
       </Box>
