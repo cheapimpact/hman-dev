@@ -9,6 +9,7 @@ import {
   AccordionSummary,
   Box,
   Chip,
+  CircularProgress,
   createTheme,
   CssBaseline,
   Grid,
@@ -20,7 +21,10 @@ import {
 import { BarChart } from "@mui/x-charts/BarChart";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 import { LineChart } from "@mui/x-charts/LineChart";
-import React from "react";
+import React, { useEffect, useState } from "react";
+// Import Action API
+import { getDashboardData } from "@/actions/sheets";
+import { DashboardStats } from "@/types/api";
 
 function ActivityAccordion() {
   // Data Detail
@@ -168,8 +172,6 @@ function StatCard({
           xAxis={[
             { data: [1, 2, 3, 4, 5], scaleType: "point", hideTooltip: true },
           ]}
-          leftAxis={null}
-          bottomAxis={null}
           margin={{ top: 5, bottom: 0, left: 0, right: 0 }}
           sx={{ ".MuiAreaElement-root": { fillOpacity: 0.1 } }} // Transparansi area
         />
@@ -238,10 +240,45 @@ function HeatmapGrid() {
 }
 
 export default function MuiDashboardPage() {
+  const [stats, setStats] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // FETCH DATA SAAT HALAMAN DIBUKA
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const data = await getDashboardData("DASBOR_KPI_CARDS");
+        console.log("Dashboard data:", data);
+        setStats(data);
+      } catch (error) {
+        console.error("Gagal load dashboard", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          bgcolor: "#0b1219",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Box sx={{ p: 3, minHeight: "100vh" }}>
+        {stats && <pre>{JSON.stringify(stats, null, 2)}</pre>}
         <Grid container spacing={3}>
           {/* === KOLOM KIRI (UTAMA) === */}
           <Grid size={{ xs: 8, md: 8, lg: 8 }}>
@@ -349,168 +386,170 @@ export default function MuiDashboardPage() {
             </Stack>
           </Grid>
 
-          <Stack direction="row" spacing={3} size={{ xs: 12, md: 12, lg: 12 }}>
-            <Grid size={{ xs: 8, md: 8, lg: 8 }}>
-              {/* 2. AREA TENGAH: GRAFIK BESAR (MAIN CHART) */}
-              <Paper sx={{ p: 3, flexGrow: 1, minHeight: 400 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 2,
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6">
-                      Statistik Kegiatan Tahunan
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Growth (+15%)
-                    </Typography>
-                  </Box>
-                  <Chip label="Tahun 2025" size="small" variant="outlined" />
-                </Box>
-
-                <Box sx={{ width: "100%", height: 350 }}>
-                  <LineChart
-                    series={[
-                      {
-                        data: [
-                          20, 50, 80, 200, 300, 450, 400, 380, 500, 600, 550,
-                          700,
-                        ],
-                        label: "Pelatihan",
-                        area: true,
-                        showMark: false,
-                        color: "#3399FF",
-                      },
-                      {
-                        data: [
-                          10, 30, 40, 100, 150, 200, 220, 210, 300, 350, 320,
-                          400,
-                        ],
-                        label: "Lain-lain",
-                        area: true,
-                        showMark: false,
-                        color: "#FFBB28",
-                      },
-                    ]}
-                    xAxis={[
-                      {
-                        scaleType: "point",
-                        data: [
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "Mei",
-                          "Jun",
-                          "Jul",
-                          "Agu",
-                          "Sep",
-                          "Okt",
-                          "Nov",
-                          "Des",
-                        ],
-                      },
-                    ]}
+          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
+            <Stack direction="row" spacing={3}>
+              <Grid size={{ xs: 8, md: 8, lg: 8 }}>
+                {/* 2. AREA TENGAH: GRAFIK BESAR (MAIN CHART) */}
+                <Paper sx={{ p: 3, flexGrow: 1, minHeight: 400 }}>
+                  <Box
                     sx={{
-                      ".MuiLineElement-root": { strokeWidth: 3 },
-                      ".MuiAreaElement-series-Pelatihan": {
-                        fill: "url('#gradientRed')",
-                        fillOpacity: 0.3,
-                      },
-                      ".MuiAreaElement-series-Lain-lain": {
-                        fill: "url('#gradientYellow')",
-                        fillOpacity: 0.3,
-                      },
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 2,
                     }}
-                    grid={{ horizontal: true }}
                   >
-                    <defs>
-                      <linearGradient
-                        id="gradientBlue"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#3399FF"
-                          stopOpacity={0.5}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#3399FF"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                      <linearGradient
-                        id="gradientYellow"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#FFBB28"
-                          stopOpacity={0.5}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#FFBB28"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                  </LineChart>
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid size={{ xs: 4, md: 4, lg: 4 }}>
-              {/* 2. AREA TENGAH: GRAFIK BESAR (MAIN CHART) */}
-              <Paper sx={{ p: 3, flexGrow: 1, minHeight: 400 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 2,
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6">
-                      Statistik Kegiatan Mingguan
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Growth (+15%)
-                    </Typography>
+                    <Box>
+                      <Typography variant="h6">
+                        Statistik Kegiatan Tahunan
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Growth (+15%)
+                      </Typography>
+                    </Box>
+                    <Chip label="Tahun 2025" size="small" variant="outlined" />
                   </Box>
-                  <Chip label="Tahun 2025" size="small" variant="outlined" />
-                </Box>
 
-                <Box sx={{ width: "100%", height: 350 }}>
-                  <BarChart
-                    series={[
-                      {
-                        data: [35, 44, 24, 34, 50, 10, 5],
-                        color: "#3399FF",
-                      },
-                    ]}
-                    xAxis={[
-                      {
-                        scaleType: "band",
-                        data: ["Sn", "Sl", "Rb", "Km", "Jm", "Sb", "Mg"],
-                        categoryGapRatio: 0.4,
-                      },
-                    ]}
-                    margin={{ top: 10, bottom: 20, left: 0, right: 0 }}
-                  />
-                </Box>
-              </Paper>
-            </Grid>
-          </Stack>
+                  <Box sx={{ width: "100%", height: 350 }}>
+                    <LineChart
+                      series={[
+                        {
+                          data: [
+                            20, 50, 80, 200, 300, 450, 400, 380, 500, 600, 550,
+                            700,
+                          ],
+                          label: "Pelatihan",
+                          area: true,
+                          showMark: false,
+                          color: "#3399FF",
+                        },
+                        {
+                          data: [
+                            10, 30, 40, 100, 150, 200, 220, 210, 300, 350, 320,
+                            400,
+                          ],
+                          label: "Lain-lain",
+                          area: true,
+                          showMark: false,
+                          color: "#FFBB28",
+                        },
+                      ]}
+                      xAxis={[
+                        {
+                          scaleType: "point",
+                          data: [
+                            "Jan",
+                            "Feb",
+                            "Mar",
+                            "Apr",
+                            "Mei",
+                            "Jun",
+                            "Jul",
+                            "Agu",
+                            "Sep",
+                            "Okt",
+                            "Nov",
+                            "Des",
+                          ],
+                        },
+                      ]}
+                      sx={{
+                        ".MuiLineElement-root": { strokeWidth: 3 },
+                        ".MuiAreaElement-series-Pelatihan": {
+                          fill: "url('#gradientRed')",
+                          fillOpacity: 0.3,
+                        },
+                        ".MuiAreaElement-series-Lain-lain": {
+                          fill: "url('#gradientYellow')",
+                          fillOpacity: 0.3,
+                        },
+                      }}
+                      grid={{ horizontal: true }}
+                    >
+                      <defs>
+                        <linearGradient
+                          id="gradientBlue"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#3399FF"
+                            stopOpacity={0.5}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#3399FF"
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                        <linearGradient
+                          id="gradientYellow"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor="#FFBB28"
+                            stopOpacity={0.5}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor="#FFBB28"
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                      </defs>
+                    </LineChart>
+                  </Box>
+                </Paper>
+              </Grid>
+              <Grid size={{ xs: 4, md: 4, lg: 4 }}>
+                {/* 2. AREA TENGAH: GRAFIK BESAR (MAIN CHART) */}
+                <Paper sx={{ p: 3, flexGrow: 1, minHeight: 400 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 2,
+                    }}
+                  >
+                    <Box>
+                      <Typography variant="h6">
+                        Statistik Kegiatan Mingguan
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Growth (+15%)
+                      </Typography>
+                    </Box>
+                    <Chip label="Tahun 2025" size="small" variant="outlined" />
+                  </Box>
+
+                  <Box sx={{ width: "100%", height: 350 }}>
+                    <BarChart
+                      series={[
+                        {
+                          data: [35, 44, 24, 34, 50, 10, 5],
+                          color: "#3399FF",
+                        },
+                      ]}
+                      xAxis={[
+                        {
+                          scaleType: "band",
+                          data: ["Sn", "Sl", "Rb", "Km", "Jm", "Sb", "Mg"],
+                          categoryGapRatio: 0.4,
+                        },
+                      ]}
+                      margin={{ top: 10, bottom: 20, left: 0, right: 0 }}
+                    />
+                  </Box>
+                </Paper>
+              </Grid>
+            </Stack>
+          </Grid>
         </Grid>
       </Box>
     </ThemeProvider>
