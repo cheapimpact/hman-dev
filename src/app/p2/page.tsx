@@ -24,7 +24,7 @@ export default function About() {
         </Typography>
         <Box sx={{ maxWidth: 'sm' }}>
           <Button variant="contained" component={Link} href="/">
-            Go to the home page
+            Go to the home page apge
           </Button>
         </Box>
         
