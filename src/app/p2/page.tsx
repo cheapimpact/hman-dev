@@ -27,6 +27,9 @@ export default function About() {
             Go to the home page apge
           </Button>
         </Box>
+        <Box><p>cek git</p>
+
+        </Box>
         
         <ProTip />
         <Copyright />
