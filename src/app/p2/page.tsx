@@ -24,8 +24,11 @@ export default function About() {
         </Typography>
         <Box sx={{ maxWidth: 'sm' }}>
           <Button variant="contained" component={Link} href="/">
-            Go to the home page
+            Go to the home edit
           </Button>
+        </Box>
+        <Box><p>cek git</p>
+
         </Box>
         
         <ProTip />
