@@ -81,3 +81,51 @@ import { revalidatePath } from "next/cache";
 
 //   revalidatePath("/pencarian");
 // }
+
+export interface GoogleSheetParams {
+  path: string;
+  action: string;
+  named_range: string;
+}
+
+export interface DasborKPIData {
+  TRA: number;
+  "Total Kegiatan": number;
+  "Total Peserta": number;
+}
+
+export interface GoogleSheetResponse<T> {
+  status: string;
+  debugInfo?: string;
+  data: T[];
+}
+
+export async function fetchGoogleSheetData<T>(
+  params: GoogleSheetParams
+): Promise<GoogleSheetResponse<T>> {
+  const baseUrl =
+    "https://script.google.com/macros/s/AKfycbyxbKTFxNsoxYLi8sUbC3SNtGm5-VS-PSzLAL4onUG9NTPGe_qK0Ik-znppCJ_9fsjWeg/exec";
+
+  const url = new URL(baseUrl);
+  url.searchParams.append("path", params.path);
+  url.searchParams.append("action", params.action);
+  url.searchParams.append("named_range", params.named_range);
+
+  try {
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      // Revalidasi cache setiap 60 detik (bisa disesuaikan atau gunakan cache: "no-store" jika harus realtime)
+      next: { revalidate: 60 },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gagal mengambil data dari Google Sheet: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result as GoogleSheetResponse<T>;
+  } catch (error) {
+    console.error("Error fetching Google Sheet data:", error);
+    throw error;
+  }
+}
