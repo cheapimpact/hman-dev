@@ -167,8 +167,6 @@ function StatCard({
           xAxis={[
             { data: [1, 2, 3, 4, 5], scaleType: "point", hideTooltip: true },
           ]}
-          leftAxis={null}
-          bottomAxis={null}
           margin={{ top: 5, bottom: 0, left: 0, right: 0 }}
           sx={{ ".MuiAreaElement-root": { fillOpacity: 0.1 } }} // Transparansi area
         />
@@ -242,25 +240,18 @@ export default function MuiDashboardPage() {
       <CssBaseline />
       <Box sx={{ p: 3, minHeight: "100vh" }}>
         <Grid container spacing={3}>
-          {/* === KOLOM KIRI (UTAMA) === */}
-          <Grid size={{ xs: 6, md: 6, lg: 6 }}>
-            <Box>
-              <ActivityAccordion />
-            </Box>
+          {/* === KOLOM ATAS === */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <ActivityAccordion />
           </Grid>
-          <Grid size={{ xs: 6, md: 6, lg: 6 }}>
-            <Box>
-              <ActivityAccordion />
-            </Box>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <ActivityAccordion />
           </Grid>
-          <Grid size={{ xs: 8, md: 8, lg: 8 }}>
-            <Stack
-              direction="row"
-              spacing={3}
-              sx={{ xs: 12, md: 12, height: "100%" }}
-            >
-              {/* 1. ROW ATAS: 3 KPI CARDS */}
-              <Grid>
+          
+          {/* === KPI & TARGET === */}
+          <Grid size={{ xs: 12, md: 8 }}>
+            <Grid container spacing={3} sx={{ height: "100%" }}>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <StatCard
                   title="Total Peserta"
                   value="144k"
@@ -268,7 +259,7 @@ export default function MuiDashboardPage() {
                   data={[10, 15, 12, 20, 18]}
                 />
               </Grid>
-              <Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <StatCard
                   title="Sertifikat Terbit"
                   value="325k"
@@ -276,7 +267,7 @@ export default function MuiDashboardPage() {
                   data={[20, 18, 25, 22, 30]}
                 />
               </Grid>
-              <Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
                 <StatCard
                   title="Diklat Aktif"
                   value="200k"
@@ -284,174 +275,176 @@ export default function MuiDashboardPage() {
                   data={[5, 8, 12, 10, 15]}
                 />
               </Grid>
-            </Stack>
+            </Grid>
           </Grid>
 
-          <Grid size={{ xs: 4, md: 4 }}>
-            <Stack spacing={3}>
-              <Paper
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Paper
+              sx={{
+                p: 3,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Typography variant="body1" fontWeight="bold" gutterBottom>
+                Target Realisasi Anggaran
+              </Typography>
+              <Box sx={{ width: "100%", height: 150, position: "relative" }}>
+                <Gauge
+                  value={75}
+                  startAngle={-110}
+                  endAngle={110}
+                  sx={{
+                    [`& .${gaugeClasses.valueText}`]: {
+                      fontSize: 24,
+                      transform: "translate(0px, 0px)",
+                      fill: "#fff",
+                    },
+                    [`& .${gaugeClasses.valueArc}`]: {
+                      fill: "#3399FF",
+                    },
+                  }}
+                  text={({ value }) => `${value}%`}
+                />
+              </Box>
+              <Stack direction="row" spacing={2} sx={{ mt: -2 }}>
+                <Box display="flex" alignItems="center" gap={0.5}>
+                  <CircleIcon sx={{ fontSize: 10, color: "#3399FF" }} />{" "}
+                  <Typography variant="caption">Terpakai</Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={0.5}>
+                  <CircleIcon sx={{ fontSize: 10, color: "#2D3748" }} />{" "}
+                  <Typography variant="caption">Sisa</Typography>
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
+
+          {/* === GRAFIK UTAMA & SAMPING === */}
+          <Grid size={{ xs: 12, md: 8 }}>
+            <Paper sx={{ p: 3, height: "100%", minHeight: 400 }}>
+              <Box
                 sx={{
-                  p: 3,
                   display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
+                  justifyContent: "space-between",
+                  mb: 2,
                 }}
               >
-                <Typography variant="body1" fontWeight="bold" gutterBottom>
-                  Target Realisasi Anggaran
-                </Typography>
-                <Box sx={{ width: "100%", height: 150, position: "relative" }}>
-                  <Gauge
-                    value={75}
-                    startAngle={-110}
-                    endAngle={110}
-                    sx={{
-                      [`& .${gaugeClasses.valueText}`]: {
-                        fontSize: 24,
-                        transform: "translate(0px, 0px)",
-                        fill: "#fff",
-                      },
-                      [`& .${gaugeClasses.valueArc}`]: {
-                        fill: "#3399FF",
-                      },
-                    }}
-                    text={({ value }) => `${value}%`}
-                  />
+                <Box>
+                  <Typography variant="h6">
+                    Statistik Peserta Tahunan
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Growth (+15%)
+                  </Typography>
                 </Box>
-                <Stack direction="row" spacing={2} sx={{ mt: -2 }}>
-                  <Box display="flex" alignItems="center" gap={0.5}>
-                    <CircleIcon sx={{ fontSize: 10, color: "#3399FF" }} />{" "}
-                    <Typography variant="caption">Terpakai</Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center" gap={0.5}>
-                    <CircleIcon sx={{ fontSize: 10, color: "#2D3748" }} />{" "}
-                    <Typography variant="caption">Sisa</Typography>
-                  </Box>
-                </Stack>
-              </Paper>
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, md: 12, lg: 12 }}>
-            <Grid size={{ xs: 8, md: 8, lg: 8 }}>
-              {/* 2. AREA TENGAH: GRAFIK BESAR (MAIN CHART) */}
-              <Paper sx={{ p: 3, flexGrow: 1, minHeight: 400 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    mb: 2,
-                  }}
-                >
-                  <Box>
-                    <Typography variant="h6">
-                      Statistik Peserta Tahunan
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      Growth (+15%)
-                    </Typography>
-                  </Box>
-                  <Chip label="Tahun 2025" size="small" variant="outlined" />
-                </Box>
+                <Chip label="Tahun 2025" size="small" variant="outlined" />
+              </Box>
 
-                <Box sx={{ width: "100%", height: 350 }}>
-                  <LineChart
-                    series={[
-                      {
-                        data: [
-                          20, 50, 80, 200, 300, 450, 400, 380, 500, 600, 550,
-                          700,
-                        ],
-                        label: "Peserta",
-                        area: true,
-                        showMark: false,
-                        color: "#3399FF",
-                      },
-                      {
-                        data: [
-                          10, 30, 40, 100, 150, 200, 220, 210, 300, 350, 320,
-                          400,
-                        ],
-                        label: "Lulus",
-                        area: true,
-                        showMark: false,
-                        color: "#FFBB28",
-                      },
-                    ]}
-                    xAxis={[
-                      {
-                        scaleType: "point",
-                        data: [
-                          "Jan",
-                          "Feb",
-                          "Mar",
-                          "Apr",
-                          "Mei",
-                          "Jun",
-                          "Jul",
-                          "Agu",
-                          "Sep",
-                          "Okt",
-                          "Nov",
-                          "Des",
-                        ],
-                      },
-                    ]}
-                    sx={{
-                      ".MuiLineElement-root": { strokeWidth: 3 },
-                      ".MuiAreaElement-series-Peserta": {
-                        fill: "url('#gradientBlue')",
-                        fillOpacity: 0.3,
-                      },
-                      ".MuiAreaElement-series-Lulus": {
-                        fill: "url('#gradientYellow')",
-                        fillOpacity: 0.3,
-                      },
-                    }}
-                    grid={{ horizontal: true }}
-                  >
-                    <defs>
-                      <linearGradient
-                        id="gradientBlue"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#3399FF"
-                          stopOpacity={0.5}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#3399FF"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                      <linearGradient
-                        id="gradientYellow"
-                        x1="0"
-                        y1="0"
-                        x2="0"
-                        y2="1"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#FFBB28"
-                          stopOpacity={0.5}
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#FFBB28"
-                          stopOpacity={0}
-                        />
-                      </linearGradient>
-                    </defs>
-                  </LineChart>
-                </Box>
-              </Paper>
-            </Grid>
-            <Grid size={{ xs: 4, md: 4, lg: 4 }}>
+              <Box sx={{ width: "100%", height: 350 }}>
+                <LineChart
+                  series={[
+                    {
+                      data: [
+                        20, 50, 80, 200, 300, 450, 400, 380, 500, 600, 550,
+                        700,
+                      ],
+                      label: "Peserta",
+                      area: true,
+                      showMark: false,
+                      color: "#3399FF",
+                    },
+                    {
+                      data: [
+                        10, 30, 40, 100, 150, 200, 220, 210, 300, 350, 320,
+                        400,
+                      ],
+                      label: "Lulus",
+                      area: true,
+                      showMark: false,
+                      color: "#FFBB28",
+                    },
+                  ]}
+                  xAxis={[
+                    {
+                      scaleType: "point",
+                      data: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "Mei",
+                        "Jun",
+                        "Jul",
+                        "Agu",
+                        "Sep",
+                        "Okt",
+                        "Nov",
+                        "Des",
+                      ],
+                    },
+                  ]}
+                  sx={{
+                    ".MuiLineElement-root": { strokeWidth: 3 },
+                    ".MuiAreaElement-series-Peserta": {
+                      fill: "url('#gradientBlue')",
+                      fillOpacity: 0.3,
+                    },
+                    ".MuiAreaElement-series-Lulus": {
+                      fill: "url('#gradientYellow')",
+                      fillOpacity: 0.3,
+                    },
+                  }}
+                  grid={{ horizontal: true }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="gradientBlue"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="#3399FF"
+                        stopOpacity={0.5}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="#3399FF"
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                    <linearGradient
+                      id="gradientYellow"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="0%"
+                        stopColor="#FFBB28"
+                        stopOpacity={0.5}
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="#FFBB28"
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                </LineChart>
+              </Box>
+            </Paper>
+          </Grid>
+          
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Stack spacing={3} sx={{ height: "100%" }}>
               {/* 2. BAR CHART HARIAN */}
               <Paper sx={{ p: 3 }}>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
@@ -463,7 +456,6 @@ export default function MuiDashboardPage() {
                       {
                         data: [35, 44, 24, 34, 50, 10, 5],
                         color: "#3399FF",
-                        borderRadius: 4,
                       },
                     ]}
                     xAxis={[
@@ -473,20 +465,19 @@ export default function MuiDashboardPage() {
                         categoryGapRatio: 0.4,
                       },
                     ]}
-                    leftAxis={null} // Hilangkan sumbu Y agar bersih
                     margin={{ top: 10, bottom: 20, left: 0, right: 0 }}
                   />
                 </Box>
               </Paper>
 
               {/* 3. HEATMAP (AKTIVITAS JAM) */}
-              <Paper sx={{ p: 3 }}>
+              <Paper sx={{ p: 3, flexGrow: 1 }}>
                 <Typography variant="body2" color="text.secondary" gutterBottom>
                   Waktu Akses Terpadat
                 </Typography>
                 <HeatmapGrid />
               </Paper>
-            </Grid>
+            </Stack>
           </Grid>
         </Grid>
       </Box>
