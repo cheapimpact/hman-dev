@@ -5,22 +5,25 @@ import {
   styled,
   Theme,
   CSSObject,
-  ThemeProvider,
-  createTheme,
 } from "@mui/material/styles";
 import Box from "@mui/material/Box";
-import MuiDrawer from "@mui/material/Drawer";
+import MuiDrawer, { drawerClasses } from "@mui/material/Drawer";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import List from "@mui/material/List";
-import CssBaseline from "@mui/material/CssBaseline";
-import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import Avatar from "@mui/material/Avatar";
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import Tooltip from "@mui/material/Tooltip";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { useTheme } from "@mui/material/styles";
 
 // ICONS
 import MenuIcon from "@mui/icons-material/Menu";
@@ -29,55 +32,16 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import SearchIcon from "@mui/icons-material/Search";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
+import SchoolIcon from "@mui/icons-material/School";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import ColorModeToggle from "@/components/ColorModeToggle";
 
 const drawerWidth = 240;
 
-// --- 1. TEMA DARK MODE SELARAS DENGAN DASHBOARD ---
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    background: {
-      default: "#0b1219", // Background Utama (Deep Dark)
-      paper: "#0F1924", // Warna Sidebar & Header
-    },
-    primary: { main: "#3399FF" }, // Biru Terang (MUI Blue)
-    text: {
-      primary: "#fff",
-      secondary: "#B2BAC2",
-    },
-    divider: "rgba(255, 255, 255, 0.08)", // Garis pemisah sangat halus
-  },
-  typography: {
-    fontFamily: '"Plus Jakarta Sans", "Inter", sans-serif',
-    h6: { fontWeight: 600 },
-  },
-  components: {
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8, // Sudut tombol sidebar sedikit membulat
-          margin: "4px 8px", // Memberi jarak antar tombol
-          "&.Mui-selected": {
-            backgroundColor: "rgba(51, 153, 255, 0.16)", // Biru transparan saat aktif
-            color: "#3399FF",
-            "&:hover": {
-              backgroundColor: "rgba(51, 153, 255, 0.24)",
-            },
-            "& .MuiListItemIcon-root": {
-              color: "#3399FF", // Icon jadi biru saat aktif
-            },
-          },
-          "&:hover": {
-            backgroundColor: "rgba(255, 255, 255, 0.04)",
-          },
-        },
-      },
-    },
-  },
-});
-
-// --- MIXINS (Logika Animasi Sidebar) ---
+// ─── MIXINS ───────────────────────────────────────────────────────────────────
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
   transition: theme.transitions.create("width", {
@@ -85,8 +49,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
     duration: theme.transitions.duration.enteringScreen,
   }),
   overflowX: "hidden",
-  backgroundColor: theme.palette.background.paper,
-  borderRight: "1px solid rgba(255,255,255,0.08)", // Border kanan halus
+  boxSizing: "border-box",
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -99,15 +62,14 @@ const closedMixin = (theme: Theme): CSSObject => ({
   [theme.breakpoints.up("sm")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
-  backgroundColor: theme.palette.background.paper,
-  borderRight: "1px solid rgba(255,255,255,0.08)",
+  boxSizing: "border-box",
 });
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
-  justifyContent: "flex-end",
-  padding: theme.spacing(0, 1),
+  justifyContent: "space-between",
+  padding: theme.spacing(0, 1, 0, 2),
   ...theme.mixins.toolbar,
 }));
 
@@ -119,10 +81,10 @@ const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
   zIndex: theme.zIndex.drawer + 1,
-  backgroundColor: theme.palette.background.default, // Header menyatu dengan background body
-  borderBottom: "1px solid rgba(255,255,255,0.08)",
-  boxShadow: "none", // Flat design
-  backdropFilter: "blur(8px)", // Sedikit blur jika konten scroll lewat bawah header
+  boxShadow: "none",
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundImage: "none",
+  backgroundColor: (theme.vars || theme).palette.background.default,
   transition: theme.transitions.create(["width", "margin"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -144,6 +106,10 @@ const Drawer = styled(MuiDrawer, {
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
+  [`& .${drawerClasses.paper}`]: {
+    backgroundColor: (theme.vars || theme).palette.background.paper,
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
   ...(open && {
     ...openedMixin(theme),
     "& .MuiDrawer-paper": openedMixin(theme),
@@ -154,118 +120,238 @@ const Drawer = styled(MuiDrawer, {
   }),
 }));
 
+// ─── MENU ITEMS ───────────────────────────────────────────────────────────────
+const menuItems = [
+  { text: "Beranda", icon: <HomeRoundedIcon />, href: "/" },
+  { text: "Dashboard", icon: <DashboardIcon />, href: "/dashboard" },
+  { text: "Cari Data", icon: <SearchIcon />, href: "/caripeserta" },
+  { text: "Diklat", icon: <SchoolIcon />, href: "/diklat" },
+  { text: "Analitik", icon: <AnalyticsIcon />, href: "/analitik" },
+  { text: "Laporan", icon: <DescriptionIcon />, href: "/laporan" },
+];
+
+// ─── OPTIONS MENU (user profile) ─────────────────────────────────────────────
+function OptionsMenu() {
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  return (
+    <>
+      <Tooltip title="Pengaturan akun">
+        <IconButton
+          size="small"
+          onClick={(e) => setAnchorEl(e.currentTarget)}
+          aria-controls={open ? "account-menu" : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? "true" : undefined}
+        >
+          <MoreVertIcon fontSize="small" />
+        </IconButton>
+      </Tooltip>
+      <Menu
+        id="account-menu"
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => setAnchorEl(null)}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+      >
+        <MenuItem onClick={() => setAnchorEl(null)}>Profil</MenuItem>
+        <MenuItem onClick={() => setAnchorEl(null)}>Pengaturan</MenuItem>
+        <Divider />
+        <MenuItem onClick={() => setAnchorEl(null)}>Keluar</MenuItem>
+      </Menu>
+    </>
+  );
+}
+
+// ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = React.useState(true); // Default sidebar TERBUKA agar terlihat menu
-
-  const handleDrawerOpen = () => setOpen(true);
-  const handleDrawerClose = () => setOpen(false);
-
-  const menuItems = [
-    { text: "Dashboard", icon: <DashboardIcon />, href: "/dashboard" }, // Arahkan ke /dashboard
-    { text: "Cari Data", icon: <SearchIcon />, href: "/pencarian" },
-    { text: "Analitik", icon: <AnalyticsIcon />, href: "/analitik" },
-    { text: "Laporan", icon: <DescriptionIcon />, href: "/laporan" },
-  ];
+  const [open, setOpen] = React.useState(true);
+  const pathname = usePathname();
+  const theme = useTheme();
 
   return (
-    <ThemeProvider theme={darkTheme}>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
+    <Box sx={{ display: "flex" }}>
+      {/* ── APP BAR (mobile) ── */}
+      <AppBar
+        position="fixed"
+        open={open}
+        sx={{ display: { md: "none" } }}
+      >
+        <Toolbar>
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={() => setOpen(true)}
+            edge="start"
+            sx={{ mr: 2, ...(open && { display: "none" }) }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" noWrap sx={{ fontWeight: 700 }}>
+            HRD App
+          </Typography>
+        </Toolbar>
+      </AppBar>
 
-        {/* --- HEADER --- */}
-        <AppBar position="fixed" open={open}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={handleDrawerOpen}
-              edge="start"
-              sx={{
-                marginRight: 5,
-                ...(open && { display: "none" }),
-                color: "#3399FF", // Icon menu biru
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
+      {/* ── SIDEBAR ── */}
+      <Drawer
+        variant="permanent"
+        open={open}
+        sx={{ display: { xs: "none", md: "block" } }}
+      >
+        {/* Header Sidebar — Logo + Toggle */}
+        <DrawerHeader>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, opacity: open ? 1 : 0, transition: "opacity 0.2s" }}>
+            <SchoolIcon sx={{ color: "primary.main", fontSize: 22 }} />
             <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ color: "#fff", fontWeight: 700 }}
+              variant="subtitle1"
+              sx={{ fontWeight: 700, color: "text.primary", whiteSpace: "nowrap" }}
             >
-              KANTOR APP
+              HRD App
             </Typography>
-          </Toolbar>
-        </AppBar>
+          </Box>
+          <IconButton onClick={() => setOpen(!open)} size="small">
+            {open ? <ChevronLeftIcon /> : <MenuIcon />}
+          </IconButton>
+        </DrawerHeader>
 
-        {/* --- SIDEBAR --- */}
-        <Drawer variant="permanent" open={open}>
-          <DrawerHeader>
-            <IconButton
-              onClick={handleDrawerClose}
-              sx={{ color: "text.secondary" }}
-            >
-              <ChevronLeftIcon />
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
+        <Divider />
 
-          <List sx={{ mt: 1 }}>
-            {menuItems.map((item) => (
-              <Link
-                key={item.text}
-                href={item.href}
-                passHref
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <ListItem disablePadding sx={{ display: "block" }}>
-                  <ListItemButton
-                    sx={{
-                      minHeight: 48,
-                      justifyContent: open ? "initial" : "center",
-                      px: 2.5,
-                    }}
-                  >
-                    <ListItemIcon
-                      sx={{
-                        minWidth: 0,
-                        mr: open ? 3 : "auto",
-                        justifyContent: "center",
-                        color: "text.secondary", // Default icon abu-abu
-                      }}
+        {/* Menu Items */}
+        <Box sx={{ overflow: "auto", flexGrow: 1, mt: 1 }}>
+          <List>
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.text}
+                  href={item.href}
+                  passHref
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <ListItem disablePadding sx={{ display: "block" }}>
+                    <Tooltip
+                      title={!open ? item.text : ""}
+                      placement="right"
+                      arrow
                     >
-                      {item.icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={item.text}
-                      sx={{ opacity: open ? 1 : 0 }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-            ))}
+                      <ListItemButton
+                        selected={isActive}
+                        sx={{
+                          minHeight: 44,
+                          justifyContent: open ? "initial" : "center",
+                          px: 2.5,
+                          mx: 1,
+                          borderRadius: 2,
+                          mb: 0.5,
+                        }}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            minWidth: 0,
+                            mr: open ? 2 : "auto",
+                            justifyContent: "center",
+                            color: isActive
+                              ? "primary.main"
+                              : "text.secondary",
+                          }}
+                        >
+                          {item.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={item.text}
+                          sx={{
+                            opacity: open ? 1 : 0,
+                            "& .MuiListItemText-primary": {
+                              fontSize: "0.875rem",
+                              fontWeight: isActive ? 600 : 400,
+                              color: isActive ? "text.primary" : "text.secondary",
+                            },
+                          }}
+                        />
+                      </ListItemButton>
+                    </Tooltip>
+                  </ListItem>
+                </Link>
+              );
+            })}
           </List>
-        </Drawer>
+        </Box>
 
-        {/* --- KONTEN UTAMA --- */}
-        <Box
-          component="main"
+        <Divider />
+
+        {/* User Profile Footer */}
+        <Stack
+          direction="row"
           sx={{
-            flexGrow: 1,
-            p: 0,
-            minHeight: "100vh",
-            bgcolor: "background.default",
+            p: 2,
+            gap: 1,
+            alignItems: "center",
+            overflow: "hidden",
           }}
         >
-          <DrawerHeader /> {/* Spacer */}
-          {children}
-        </Box>
+          <Avatar
+            sizes="small"
+            alt="Admin HRD"
+            sx={{
+              width: 34,
+              height: 34,
+              bgcolor: "primary.main",
+              fontSize: "0.875rem",
+              flexShrink: 0,
+            }}
+          >
+            AH
+          </Avatar>
+          <Box
+            sx={{
+              minWidth: 0,
+              opacity: open ? 1 : 0,
+              transition: "opacity 0.2s",
+              flexGrow: 1,
+            }}
+          >
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 500, lineHeight: "16px", whiteSpace: "nowrap" }}
+            >
+              Admin HRD
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.secondary",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                display: "block",
+              }}
+            >
+              admin@hrd.go.id
+            </Typography>
+          </Box>
+          {open && <ColorModeToggle />}
+          {open && <OptionsMenu />}
+        </Stack>
+      </Drawer>
+
+      {/* ── MAIN CONTENT ── */}
+      <Box
+        component="div"
+        sx={{
+          flexGrow: 1,
+          minHeight: "100vh",
+          bgcolor: "background.default",
+          mt: { xs: "56px", md: 0 },
+        }}
+      >
+        {children}
       </Box>
-    </ThemeProvider>
+    </Box>
   );
 }
