@@ -35,7 +35,7 @@ export default function DashboardVisuals() {
     <Box>
       {/* --- BAGIAN 1: KPI CARDS (TETAP SAMA) --- */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card
             sx={{
               bgcolor: "#393E46",
@@ -66,7 +66,7 @@ export default function DashboardVisuals() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card
             sx={{
               bgcolor: "#393E46",
@@ -97,7 +97,7 @@ export default function DashboardVisuals() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Card
             sx={{
               bgcolor: "#393E46",
@@ -133,7 +133,7 @@ export default function DashboardVisuals() {
       {/* --- BAGIAN 2: GRAFIK (MUI X CHARTS) --- */}
       <Grid container spacing={3}>
         {/* Grafik 1: Bar Chart */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Paper
             sx={{ p: 3, bgcolor: "#393E46", color: "#EEEEEE", borderRadius: 2 }}
           >
@@ -184,7 +184,7 @@ export default function DashboardVisuals() {
         </Grid>
 
         {/* Grafik 2: Pie Chart */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper
             sx={{
               p: 3,
