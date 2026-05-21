@@ -171,9 +171,6 @@ export default function DashboardVisuals() {
                       stroke: "#EEEEEE",
                       strokeWidth: 1,
                     },
-                    [`.${axisClasses.text}`]: {
-                      fill: "#EEEEEE",
-                    },
                   },
                 }}
                 height={300}
@@ -210,7 +207,7 @@ export default function DashboardVisuals() {
                 series={[
                   {
                     data: dataLembaga,
-                    highlightScope: { faded: "global", highlighted: "item" },
+                    highlightScope: { fade: "global", highlight: "item" },
                     faded: {
                       innerRadius: 30,
                       additionalRadius: -30,
@@ -231,15 +228,7 @@ export default function DashboardVisuals() {
                   },
                 }}
                 slotProps={{
-                  legend: {
-                    direction: "row",
-                    position: { vertical: "bottom", horizontal: "middle" },
-                    padding: 0,
-                    labelStyle: {
-                      fill: "#EEEEEE", // Text Legend Putih
-                      fontSize: 14,
-                    },
-                  },
+                  legend: {},
                 }}
                 height={300}
               />

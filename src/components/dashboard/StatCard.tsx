@@ -8,7 +8,7 @@ import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart";
-import { lineElementClasses } from "@mui/x-charts/LineChart";
+
 
 export type StatCardProps = {
   title: string;
@@ -113,7 +113,7 @@ export default function StatCard({
                 data: daysInMonth,
               }}
               sx={{
-                [`& .${lineElementClasses.area}`]: {
+                [`& .MuiAreaElement-root`]: {
                   fill: `url(#area-gradient-${value})`,
                 },
               }}

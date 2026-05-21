@@ -150,15 +150,6 @@ export default function GrafikKegiatanBulanan({ data }: Props) {
                 ]}
                 grid={{ horizontal: true }}
                 margin={{ left: 36, right: 16, top: 8, bottom: 32 }}
-                slotProps={{
-                  legend: {
-                    direction: "row",
-                    position: { vertical: "bottom", horizontal: "middle" },
-                    itemMarkWidth: 8,
-                    itemMarkHeight: 8,
-                    labelStyle: { fontSize: 12 },
-                  },
-                }}
               />
             </CardContent>
           </Card>
@@ -201,9 +192,6 @@ export default function GrafikKegiatanBulanan({ data }: Props) {
                 ]}
                 grid={{ horizontal: true }}
                 margin={{ left: 48, right: 16, top: 8, bottom: 32 }}
-                slotProps={{
-                  legend: { hidden: true },
-                }}
               />
             </CardContent>
           </Card>

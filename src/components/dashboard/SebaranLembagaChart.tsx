@@ -38,7 +38,7 @@ export default function SebaranLembagaChart() {
             series={[
               {
                 data: dataLembaga,
-                highlightScope: { faded: "global", highlighted: "item" },
+                highlightScope: { fade: "global", highlight: "item" },
                 faded: {
                   innerRadius: 30,
                   additionalRadius: -30,
@@ -58,7 +58,7 @@ export default function SebaranLembagaChart() {
                 fontSize: "0.75rem",
               },
             }}
-            slotProps={{ legend: { hidden: true } }}
+            slotProps={{ legend: {} }}
             height={200}
           />
         </Box>
