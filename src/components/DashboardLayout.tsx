@@ -23,13 +23,12 @@ import Typography from "@mui/material/Typography";
 import Tooltip from "@mui/material/Tooltip";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useTheme } from "@mui/material/styles";
+
 
 // ICONS
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import SearchIcon from "@mui/icons-material/Search";
 import DescriptionIcon from "@mui/icons-material/Description";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import SchoolIcon from "@mui/icons-material/School";
@@ -122,12 +121,11 @@ const Drawer = styled(MuiDrawer, {
 
 // ─── MENU ITEMS ───────────────────────────────────────────────────────────────
 const menuItems = [
-  { text: "Beranda", icon: <HomeRoundedIcon />, href: "/" },
-  { text: "Dashboard", icon: <DashboardIcon />, href: "/dashboard" },
-  { text: "Cari Data", icon: <SearchIcon />, href: "/caripeserta" },
-  { text: "Diklat", icon: <SchoolIcon />, href: "/diklat" },
-  { text: "Analitik", icon: <AnalyticsIcon />, href: "/analitik" },
-  { text: "Laporan", icon: <DescriptionIcon />, href: "/laporan" },
+  { text: "Home", icon: <HomeRoundedIcon />, href: "/" },
+  { text: "Dashboard P1", icon: <DashboardIcon />, href: "/dashboard/p1" },
+  { text: "Dashboard P2", icon: <AnalyticsIcon />, href: "/dashboard/p2" },
+  { text: "Dashboard JF", icon: <DescriptionIcon />, href: "/dashboard/jf" },
+  { text: "Diklat", icon: <SchoolIcon />, href: "/dashboard/jf" },
 ];
 
 // ─── OPTIONS MENU (user profile) ─────────────────────────────────────────────
@@ -172,7 +170,6 @@ export default function DashboardLayout({
 }) {
   const [open, setOpen] = React.useState(true);
   const pathname = usePathname();
-  const theme = useTheme();
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -205,16 +202,18 @@ export default function DashboardLayout({
         sx={{ display: { xs: "none", md: "block" } }}
       >
         {/* Header Sidebar — Logo + Toggle */}
-        <DrawerHeader>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1, opacity: open ? 1 : 0, transition: "opacity 0.2s" }}>
-            <SchoolIcon sx={{ color: "primary.main", fontSize: 22 }} />
-            <Typography
-              variant="subtitle1"
-              sx={{ fontWeight: 700, color: "text.primary", whiteSpace: "nowrap" }}
-            >
-              HRD App
-            </Typography>
-          </Box>
+        <DrawerHeader sx={{ justifyContent: open ? "space-between" : "center" }}>
+          {open && (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              <SchoolIcon sx={{ color: "primary.main", fontSize: 22 }} />
+              <Typography
+                variant="subtitle1"
+                sx={{ fontWeight: 700, color: "text.primary", whiteSpace: "nowrap" }}
+              >
+                HRD App
+              </Typography>
+            </Box>
+          )}
           <IconButton onClick={() => setOpen(!open)} size="small">
             {open ? <ChevronLeftIcon /> : <MenuIcon />}
           </IconButton>

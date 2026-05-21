@@ -94,6 +94,29 @@ export interface DasborKPIData {
   "Total Peserta": number;
 }
 
+export interface DasborGrafikBulanan {
+  "Tren Waktu": string;
+  "Jumlah Kegiatan per Bulan": number;
+  "Akumulasi Penyerapan Anggaran per Bulan": string | number;
+  "Jumlah Kegiatan per Bulan (Pelatihan)": number;
+  "Jumlah Kegiatan per Bulan (Lain-lain)": number;
+  "Jumlah Peserta Per Bulan": number;
+}
+
+export interface DasborKegiatanBerjalan {
+  "ID KEGIATAN": string | number;
+  "NAMA KEGIATAN": string;
+  "SUBBAG": string;
+  "JENIS KEGIATAN": string;
+  "JENIS PELATIHAN": string;
+  "Perlu SPD?": string;
+  "PENYELENGGARA": string;
+  "TANGGAL MULAI": string;
+  "TANGGAL SELESAI": string;
+  "LOKASI PENYELENGGARAAN": string;
+  "JUMLAH PESERTA": number | string;
+}
+
 export interface GoogleSheetResponse<T> {
   status: string;
   debugInfo?: string;
