@@ -34,6 +34,7 @@ import AnalyticsIcon from "@mui/icons-material/Analytics";
 import SchoolIcon from "@mui/icons-material/School";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import MosqueIcon from "@mui/icons-material/Mosque";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ColorModeToggle from "@/components/ColorModeToggle";
@@ -126,6 +127,7 @@ const menuItems = [
   { text: "Dashboard P2", icon: <AnalyticsIcon />, href: "/dashboard/p2" },
   { text: "Dashboard JF", icon: <DescriptionIcon />, href: "/dashboard/jf" },
   { text: "Diklat", icon: <SchoolIcon />, href: "/dashboard/jf" },
+  { text: "MonevIbadah", icon: <MosqueIcon />, href: "/dashboard/monev-ibadah" },
 ];
 
 // ─── OPTIONS MENU (user profile) ─────────────────────────────────────────────
