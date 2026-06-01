@@ -127,7 +127,7 @@ const menuItems = [
   { text: "Dashboard P2", icon: <AnalyticsIcon />, href: "/dashboard/p2" },
   { text: "Dashboard JF", icon: <DescriptionIcon />, href: "/dashboard/jf" },
   { text: "Diklat", icon: <SchoolIcon />, href: "/dashboard/jf" },
-  { text: "MonevIbadah", icon: <MosqueIcon />, href: "/dashboard/monev-ibadah" },
+  // { text: "MonevIbadah", icon: <MosqueIcon />, href: "/dashboard/monev-ibadah" },
 ];
 
 // ─── OPTIONS MENU (user profile) ─────────────────────────────────────────────

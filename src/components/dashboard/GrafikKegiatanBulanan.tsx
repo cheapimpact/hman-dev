@@ -8,7 +8,7 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Grid from "@mui/material/Grid";
 import Chip from "@mui/material/Chip";
-import { useTheme } from "@mui/material/styles";
+import { useTheme, alpha } from "@mui/material/styles";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { DasborGrafikBulanan } from "@/actions/data";
@@ -22,19 +22,44 @@ function KpiCard({
   value,
   sub,
   color,
+  icon,
 }: {
   label: string;
   value: string | number;
   sub?: string;
   color: string;
+  icon: string;
 }) {
+  const theme = useTheme();
   return (
-    <Card variant="outlined" sx={{ flex: 1, minWidth: 130 }}>
-      <CardContent sx={{ p: "12px 16px !important" }}>
-        <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500 }}>
-          {label}
-        </Typography>
-        <Typography variant="h5" sx={{ fontWeight: 700, color, mt: 0.5 }}>
+    <Card
+      elevation={0}
+      sx={{
+        flex: 1,
+        minWidth: 130,
+        border: `1px solid ${alpha(color, 0.2)}`,
+        borderRadius: 3,
+        bgcolor: alpha(color, 0.05),
+      }}
+    >
+      <CardContent sx={{ p: "16px !important" }}>
+        <Stack direction="row" alignItems="center" spacing={1} mb={1}>
+          <Box
+            sx={{
+              p: 0.75,
+              borderRadius: 1.5,
+              bgcolor: alpha(color, 0.12),
+              fontSize: 16,
+              lineHeight: 1,
+            }}
+          >
+            {icon}
+          </Box>
+          <Typography variant="caption" sx={{ color: "text.secondary", fontWeight: 500 }}>
+            {label}
+          </Typography>
+        </Stack>
+        <Typography variant="h5" sx={{ fontWeight: 800, color, mb: sub ? 0.25 : 0 }}>
           {value}
         </Typography>
         {sub && (
@@ -92,17 +117,20 @@ export default function GrafikKegiatanBulanan({ data }: Props) {
           value={totalKegiatan}
           sub={`${totalPelatihan} pelatihan`}
           color={colorPelatihan}
+          icon="🎯"
         />
         <KpiCard
           label="Total Peserta YTD"
           value={totalPeserta.toLocaleString("id-ID")}
           color={colorPeserta}
+          icon="👥"
         />
         <KpiCard
           label="Bulan Paling Aktif"
           value={shortMonth(peakMonth["Tren Waktu"])}
           sub={`${peakMonth["Jumlah Peserta Per Bulan"].toLocaleString("id-ID")} peserta`}
           color={colorLainnya}
+          icon="🏆"
         />
       </Stack>
 
@@ -110,25 +138,49 @@ export default function GrafikKegiatanBulanan({ data }: Props) {
       <Grid container spacing={2}>
         {/* Bar Chart: Kegiatan */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
+          <Card
+            elevation={0}
+            sx={{
+              height: "100%",
+              border: `1px solid ${alpha(colorPelatihan, 0.2)}`,
+              borderRadius: 3,
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
               <Stack
                 direction="row"
-                sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}
+                sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}
               >
-                <Box>
-                  <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 700 }}>
-                    Jumlah Kegiatan per Bulan
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                    Tahun 2026 — Pelatihan vs Lain-lain
-                  </Typography>
-                </Box>
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <Box
+                    sx={{
+                      p: 0.75,
+                      borderRadius: 1.5,
+                      bgcolor: alpha(colorPelatihan, 0.12),
+                      fontSize: 18,
+                      lineHeight: 1,
+                    }}
+                  >
+                    📊
+                  </Box>
+                  <Box>
+                    <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      Jumlah Kegiatan per Bulan
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                      Tahun 2026 — Pelatihan vs Lain-lain
+                    </Typography>
+                  </Box>
+                </Stack>
                 <Chip
                   size="small"
                   label={`${totalKegiatan} total`}
-                  color="primary"
-                  variant="outlined"
+                  sx={{
+                    bgcolor: alpha(colorPelatihan, 0.1),
+                    color: colorPelatihan,
+                    fontWeight: 600,
+                    fontSize: "0.7rem",
+                  }}
                 />
               </Stack>
               <BarChart
@@ -150,6 +202,7 @@ export default function GrafikKegiatanBulanan({ data }: Props) {
                 ]}
                 grid={{ horizontal: true }}
                 margin={{ left: 36, right: 16, top: 8, bottom: 32 }}
+                borderRadius={6}
               />
             </CardContent>
           </Card>
@@ -157,25 +210,49 @@ export default function GrafikKegiatanBulanan({ data }: Props) {
 
         {/* Line Chart: Peserta */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card variant="outlined" sx={{ height: "100%" }}>
-            <CardContent>
+          <Card
+            elevation={0}
+            sx={{
+              height: "100%",
+              border: `1px solid ${alpha(colorPeserta, 0.2)}`,
+              borderRadius: 3,
+            }}
+          >
+            <CardContent sx={{ p: 3 }}>
               <Stack
                 direction="row"
-                sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 1 }}
+                sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 1.5 }}
               >
-                <Box>
-                  <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 700 }}>
-                    Tren Jumlah Peserta per Bulan
-                  </Typography>
-                  <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                    Tahun 2026 — kumulatif peserta kegiatan diklat
-                  </Typography>
-                </Box>
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <Box
+                    sx={{
+                      p: 0.75,
+                      borderRadius: 1.5,
+                      bgcolor: alpha(colorPeserta, 0.12),
+                      fontSize: 18,
+                      lineHeight: 1,
+                    }}
+                  >
+                    📈
+                  </Box>
+                  <Box>
+                    <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 700 }}>
+                      Tren Jumlah Peserta per Bulan
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                      Tahun 2026 — kumulatif peserta kegiatan diklat
+                    </Typography>
+                  </Box>
+                </Stack>
                 <Chip
                   size="small"
                   label={`${totalPeserta.toLocaleString("id-ID")} peserta`}
-                  color="success"
-                  variant="outlined"
+                  sx={{
+                    bgcolor: alpha(colorPeserta, 0.1),
+                    color: colorPeserta,
+                    fontWeight: 600,
+                    fontSize: "0.7rem",
+                  }}
                 />
               </Stack>
               <LineChart
@@ -192,6 +269,9 @@ export default function GrafikKegiatanBulanan({ data }: Props) {
                 ]}
                 grid={{ horizontal: true }}
                 margin={{ left: 48, right: 16, top: 8, bottom: 32 }}
+                sx={{
+                  "& .MuiAreaElement-root": { fillOpacity: 0.15 },
+                }}
               />
             </CardContent>
           </Card>

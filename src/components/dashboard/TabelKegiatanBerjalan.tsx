@@ -13,6 +13,7 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
+import { useTheme, alpha } from "@mui/material/styles";
 import { DasborKegiatanBerjalan } from "@/actions/data";
 
 // ─── Helper: Format tanggal ISO → DD MMM YYYY ─────────────────────────────────
@@ -44,29 +45,67 @@ interface Props {
 }
 
 export default function TabelKegiatanBerjalan({ data }: Props) {
+  const theme = useTheme();
   // Filter baris kosong dari Google Sheets padding
   const rows = data.filter((d) => d["NAMA KEGIATAN"] && String(d["NAMA KEGIATAN"]).trim() !== "");
 
   const totalPeserta = rows.reduce((s, d) => s + (Number(d["JUMLAH PESERTA"]) || 0), 0);
 
   return (
-    <Card variant="outlined">
-      <CardContent>
+    <Card
+      elevation={0}
+      sx={{
+        border: `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
+        borderRadius: 3,
+      }}
+    >
+      <CardContent sx={{ p: 3 }}>
         <Stack
           direction="row"
-          sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}
+          sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 2.5 }}
         >
-          <Box>
-            <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 700 }}>
-              Kegiatan Berjalan
-            </Typography>
-            <Typography variant="caption" sx={{ color: "text.secondary" }}>
-              Kegiatan yang sedang berlangsung saat ini (H+7 dan H-7)
-            </Typography>
-          </Box>
+          <Stack direction="row" alignItems="center" spacing={1.5}>
+            <Box
+              sx={{
+                p: 0.75,
+                borderRadius: 1.5,
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                fontSize: 20,
+                lineHeight: 1,
+              }}
+            >
+              📋
+            </Box>
+            <Box>
+              <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 700 }}>
+                Kegiatan Berjalan
+              </Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                Kegiatan yang sedang berlangsung saat ini (H+7 dan H-7)
+              </Typography>
+            </Box>
+          </Stack>
           <Stack direction="row" spacing={1}>
-            <Chip size="small" label={`${rows.length} kegiatan`} color="primary" variant="outlined" />
-            <Chip size="small" label={`${totalPeserta} peserta`} color="success" variant="outlined" />
+            <Chip
+              size="small"
+              label={`${rows.length} kegiatan`}
+              sx={{
+                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                color: "primary.main",
+                fontWeight: 600,
+                fontSize: "0.7rem",
+              }}
+            />
+            <Chip
+              size="small"
+              label={`${totalPeserta} peserta`}
+              sx={{
+                bgcolor: alpha(theme.palette.success.main, 0.1),
+                color: "success.main",
+                fontWeight: 600,
+                fontSize: "0.7rem",
+              }}
+            />
           </Stack>
         </Stack>
 
@@ -74,17 +113,17 @@ export default function TabelKegiatanBerjalan({ data }: Props) {
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", minWidth: 40 }}>ID</TableCell>
-                <TableCell sx={{ fontWeight: 600, minWidth: 260 }}>Nama Kegiatan</TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Jenis</TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Penyelenggara</TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Tgl Mulai</TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Tgl Selesai</TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Lokasi</TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", textAlign: "right" }}>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", minWidth: 40, bgcolor: alpha(theme.palette.primary.main, 0.04) }}>ID</TableCell>
+                <TableCell sx={{ fontWeight: 700, minWidth: 260, bgcolor: alpha(theme.palette.primary.main, 0.04) }}>Nama Kegiatan</TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", bgcolor: alpha(theme.palette.primary.main, 0.04) }}>Jenis</TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", bgcolor: alpha(theme.palette.primary.main, 0.04) }}>Penyelenggara</TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", bgcolor: alpha(theme.palette.primary.main, 0.04) }}>Tgl Mulai</TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", bgcolor: alpha(theme.palette.primary.main, 0.04) }}>Tgl Selesai</TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", bgcolor: alpha(theme.palette.primary.main, 0.04) }}>Lokasi</TableCell>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", textAlign: "right", bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
                   Peserta
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", textAlign: "center" }}>
+                <TableCell sx={{ fontWeight: 700, whiteSpace: "nowrap", textAlign: "center", bgcolor: alpha(theme.palette.primary.main, 0.04) }}>
                   SPD?
                 </TableCell>
               </TableRow>
