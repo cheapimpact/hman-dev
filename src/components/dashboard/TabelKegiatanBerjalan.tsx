@@ -22,6 +22,7 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import TablePagination from "@mui/material/TablePagination";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import { useTheme, alpha } from "@mui/material/styles";
 import { DasborKegiatanBerjalan } from "@/actions/data";
 
 // ─── Helper: Format tanggal ISO → DD MMM YYYY ─────────────────────────────────
@@ -55,6 +56,7 @@ interface Props {
 type OrderByField = keyof DasborKegiatanBerjalan;
 
 export default function TabelKegiatanBerjalan({ data }: Props) {
+  const theme = useTheme();
   // Filter baris kosong dari Google Sheets padding
   const baseRows = React.useMemo(() => {
     return data.filter((d) => d["NAMA KEGIATAN"] && String(d["NAMA KEGIATAN"]).trim() !== "");
@@ -164,89 +166,23 @@ export default function TabelKegiatanBerjalan({ data }: Props) {
   }, [sortedRows, page, rowsPerPage]);
 
   return (
-    <Card variant="outlined" sx={{ borderRadius: 2, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}>
+    <Card variant="outlined">
       <CardContent>
-        {/* Header Title */}
-        <Box sx={{ mb: 2 }}>
-          <Typography component="h2" variant="subtitle1" sx={{ fontWeight: 700, color: "text.primary" }}>
-            Daftar Kegiatan Pelatihan
-          </Typography>
-          <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            Data kegiatan diklat terintegrasi langsung dari Google Sheets
-          </Typography>
-        </Box>
-
-        {/* Tabs Control */}
-        <Tabs
-          value={activeTab}
-          onChange={handleTabChange}
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            mb: 2.5,
-            "& .MuiTab-root": {
-              textTransform: "none",
-              fontWeight: 600,
-              fontSize: "0.875rem",
-              minHeight: 40,
-              px: 3,
-            },
-          }}
-        >
-          <Tab label="Pelatihan Berjalan" id="tab-kegiatan-berjalan" />
-          <Tab label="Semua Pelatihan" id="tab-semua-kegiatan" />
-        </Tabs>
-
-        {/* Search & Stats */}
         <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          sx={{ justifyContent: "space-between", alignItems: { xs: "stretch", sm: "center" }, mb: 2.5 }}
+          direction="row"
+          sx={{ justifyContent: "space-between", alignItems: "flex-start", mb: 2 }}
         >
-          <TextField
-            id="search-kegiatan"
-            placeholder="Cari kegiatan, jenis, lokasi..."
-            size="small"
-            value={searchQuery}
-            onChange={handleSearchChange}
-            sx={{
-              maxWidth: { sm: 360 },
-              width: "100%",
-              "& .MuiOutlinedInput-root": {
-                borderRadius: 2,
-              },
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchRoundedIcon fontSize="small" sx={{ color: "text.secondary" }} />
-                </InputAdornment>
-              ),
-              endAdornment: searchQuery && (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleClearSearch} size="small" edge="end">
-                    <ClearRoundedIcon fontSize="small" />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
+          <Box>
+            <Typography component="h2" variant="subtitle2" sx={{ fontWeight: 700 }}>
+              Kegiatan Berjalan
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.secondary" }}>
+              Kegiatan yang sedang berlangsung saat ini (H+7 dan H-7)
+            </Typography>
+          </Box>
+          <Stack direction="row" spacing={1}>
 
-          <Stack direction="row" spacing={1} sx={{ justifyContent: { xs: "flex-end", sm: "flex-start" } }}>
-            <Chip
-              size="small"
-              label={`${sortedRows.length} kegiatan`}
-              color="primary"
-              variant="outlined"
-              sx={{ fontWeight: 600, borderRadius: 1.5 }}
-            />
-            <Chip
-              size="small"
-              label={`${totalPeserta} peserta`}
-              color="success"
-              variant="outlined"
-              sx={{ fontWeight: 600, borderRadius: 1.5 }}
-            />
+            <Chip size="small" label={`${totalPeserta} peserta`} color="success" variant="outlined" />
           </Stack>
         </Stack>
 
@@ -255,86 +191,18 @@ export default function TabelKegiatanBerjalan({ data }: Props) {
           <Table stickyHeader size="small">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", minWidth: 60, bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "ID KEGIATAN"}
-                    direction={orderBy === "ID KEGIATAN" ? order : "asc"}
-                    onClick={() => handleRequestSort("ID KEGIATAN")}
-                  >
-                    ID
-                  </TableSortLabel>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", minWidth: 40 }}>ID</TableCell>
+                <TableCell sx={{ fontWeight: 600, minWidth: 260 }}>Nama Kegiatan</TableCell>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Jenis</TableCell>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Penyelenggara</TableCell>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Tgl Mulai</TableCell>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Tgl Selesai</TableCell>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap" }}>Lokasi</TableCell>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", textAlign: "right" }}>
+                  Peserta
                 </TableCell>
-                <TableCell sx={{ fontWeight: 600, minWidth: 260, bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "NAMA KEGIATAN"}
-                    direction={orderBy === "NAMA KEGIATAN" ? order : "asc"}
-                    onClick={() => handleRequestSort("NAMA KEGIATAN")}
-                  >
-                    Nama Kegiatan
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "JENIS KEGIATAN"}
-                    direction={orderBy === "JENIS KEGIATAN" ? order : "asc"}
-                    onClick={() => handleRequestSort("JENIS KEGIATAN")}
-                  >
-                    Jenis
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "PENYELENGGARA"}
-                    direction={orderBy === "PENYELENGGARA" ? order : "asc"}
-                    onClick={() => handleRequestSort("PENYELENGGARA")}
-                  >
-                    Penyelenggara
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "TANGGAL MULAI"}
-                    direction={orderBy === "TANGGAL MULAI" ? order : "asc"}
-                    onClick={() => handleRequestSort("TANGGAL MULAI")}
-                  >
-                    Tgl Mulai
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "TANGGAL SELESAI"}
-                    direction={orderBy === "TANGGAL SELESAI" ? order : "asc"}
-                    onClick={() => handleRequestSort("TANGGAL SELESAI")}
-                  >
-                    Tgl Selesai
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "LOKASI PENYELENGGARAAN"}
-                    direction={orderBy === "LOKASI PENYELENGGARAAN" ? order : "asc"}
-                    onClick={() => handleRequestSort("LOKASI PENYELENGGARAAN")}
-                  >
-                    Lokasi
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", textAlign: "right", bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "JUMLAH PESERTA"}
-                    direction={orderBy === "JUMLAH PESERTA" ? order : "asc"}
-                    onClick={() => handleRequestSort("JUMLAH PESERTA")}
-                  >
-                    Peserta
-                  </TableSortLabel>
-                </TableCell>
-                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", textAlign: "center", bgcolor: "background.paper" }}>
-                  <TableSortLabel
-                    active={orderBy === "Perlu SPD?"}
-                    direction={orderBy === "Perlu SPD?" ? order : "asc"}
-                    onClick={() => handleRequestSort("Perlu SPD?")}
-                  >
-                    SPD?
-                  </TableSortLabel>
+                <TableCell sx={{ fontWeight: 600, whiteSpace: "nowrap", textAlign: "center" }}>
+                  SPD?
                 </TableCell>
               </TableRow>
             </TableHead>
