@@ -4,11 +4,10 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { PieChart } from "@mui/x-charts/PieChart";
 
-type ChartItem = { name: string; value: number; color: string };
+export type ChartItem = { name: string; value: number; color: string };
 
 function MiniPieCard({ title, data }: { title: string; data: ChartItem[] }) {
   const series = data.map((d, i) => ({
@@ -37,14 +36,12 @@ function MiniPieCard({ title, data }: { title: string; data: ChartItem[] }) {
                 faded: { innerRadius: 30, additionalRadius: -5, color: "gray" },
               },
             ]}
+            // position: horizontal uses 'start' | 'center' | 'end'
+            // vertical uses 'top' | 'middle' | 'bottom'
             slotProps={{
               legend: {
-                position: { vertical: "middle", horizontal: "right" },
-                itemMarkWidth: 10,
-                itemMarkHeight: 10,
-                markGap: 5,
-                itemGap: 6,
-                labelStyle: { fontSize: 11 },
+                direction: "vertical",
+                position: { vertical: "middle", horizontal: "end" },
               },
             }}
             margin={{ right: 120 }}
