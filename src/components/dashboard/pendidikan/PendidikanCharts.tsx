@@ -39,9 +39,7 @@ function MiniPieCard({ title, data }: { title: string; data: ChartItem[] }) {
             ]}
             slotProps={{
               legend: {
-                direction: "column",
                 position: { vertical: "middle", horizontal: "right" },
-                padding: 0,
                 itemMarkWidth: 10,
                 itemMarkHeight: 10,
                 markGap: 5,
