@@ -128,7 +128,7 @@ export async function fetchGoogleSheetData<T>(
 ): Promise<GoogleSheetResponse<T>> {
   const baseUrl =
     "https://script.google.com/macros/s/AKfycbyxbKTFxNsoxYLi8sUbC3SNtGm5-VS-PSzLAL4onUG9NTPGe_qK0Ik-znppCJ_9fsjWeg/exec";
-
+  const baseUrlPendidikan = "https://script.google.com/macros/s/AKfycbyA8Z-a2bVnSH9TvgYVA0t-fPWzF3NZOJSwwqe-KB96FuqjyJicYS80pxybTF-_9vpj/exec"
   const url = new URL(baseUrl);
   url.searchParams.append("path", params.path);
   url.searchParams.append("action", params.action);

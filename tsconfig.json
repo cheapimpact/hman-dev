@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "src/app/dashboard/jf/page.jsx"  ],
   "exclude": ["node_modules"]
 }
