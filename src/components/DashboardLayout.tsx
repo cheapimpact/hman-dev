@@ -35,6 +35,11 @@ import SchoolIcon from "@mui/icons-material/School";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import MosqueIcon from "@mui/icons-material/Mosque";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import Collapse from "@mui/material/Collapse";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ColorModeToggle from "@/components/ColorModeToggle";
@@ -121,9 +126,25 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 // ─── MENU ITEMS ───────────────────────────────────────────────────────────────
-const menuItems = [
+type MenuItem =
+  | { text: string; icon: React.ReactNode; href: string; children?: never }
+  | {
+      text: string;
+      icon: React.ReactNode;
+      href?: never;
+      children: { text: string; icon: React.ReactNode; href: string }[];
+    };
+
+const menuItems: MenuItem[] = [
   { text: "Home", icon: <HomeRoundedIcon />, href: "/" },
-  { text: "Dashboard P1", icon: <DashboardIcon />, href: "/dashboard/p1" },
+  {
+    text: "Dashboard P1",
+    icon: <DashboardIcon />,
+    children: [
+      { text: "Dashboard Pelatihan", icon: <FitnessCenterIcon />, href: "/dashboard/p1" },
+      { text: "Dashboard Pendidikan", icon: <MenuBookIcon />, href: "/dashboard/p1/pendidikan" },
+    ],
+  },
   { text: "Dashboard P2", icon: <AnalyticsIcon />, href: "/dashboard/p2" },
   { text: "Dashboard JF", icon: <DescriptionIcon />, href: "/dashboard/jf" },
   { text: "Diklat", icon: <SchoolIcon />, href: "/dashboard/jf" },
@@ -171,7 +192,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = React.useState(true);
+  const [expandedMenus, setExpandedMenus] = React.useState<Record<string, boolean>>({"Dashboard P1": true});
   const pathname = usePathname();
+
+  const toggleExpand = (text: string) => {
+    setExpandedMenus((prev) => ({ ...prev, [text]: !prev[text] }));
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -227,6 +253,110 @@ export default function DashboardLayout({
         <Box sx={{ overflow: "auto", flexGrow: 1, mt: 1 }}>
           <List>
             {menuItems.map((item) => {
+              // ── Item dengan children (collapsible) ──
+              if (item.children) {
+                const isExpanded = !!expandedMenus[item.text];
+                const isAnyChildActive = item.children.some((c) => pathname === c.href);
+                return (
+                  <React.Fragment key={item.text}>
+                    <ListItem disablePadding sx={{ display: "block" }}>
+                      <Tooltip title={!open ? item.text : ""} placement="right" arrow>
+                        <ListItemButton
+                          onClick={() => toggleExpand(item.text)}
+                          sx={{
+                            minHeight: 44,
+                            justifyContent: open ? "initial" : "center",
+                            px: 2.5,
+                            mx: 1,
+                            borderRadius: 2,
+                            mb: 0.5,
+                            bgcolor: isAnyChildActive ? "action.selected" : undefined,
+                          }}
+                        >
+                          <ListItemIcon
+                            sx={{
+                              minWidth: 0,
+                              mr: open ? 2 : "auto",
+                              justifyContent: "center",
+                              color: isAnyChildActive ? "primary.main" : "text.secondary",
+                            }}
+                          >
+                            {item.icon}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={item.text}
+                            sx={{
+                              opacity: open ? 1 : 0,
+                              "& .MuiListItemText-primary": {
+                                fontSize: "0.875rem",
+                                fontWeight: isAnyChildActive ? 600 : 400,
+                                color: isAnyChildActive ? "text.primary" : "text.secondary",
+                              },
+                            }}
+                          />
+                          {open && (isExpanded ? <ExpandLessIcon fontSize="small" sx={{ color: "text.secondary" }} /> : <ExpandMoreIcon fontSize="small" sx={{ color: "text.secondary" }} />)}
+                        </ListItemButton>
+                      </Tooltip>
+                    </ListItem>
+
+                    {/* Submenu */}
+                    <Collapse in={isExpanded && open} timeout="auto" unmountOnExit>
+                      <List disablePadding>
+                        {item.children.map((child) => {
+                          const isChildActive = pathname === child.href;
+                          return (
+                            <Link
+                              key={child.text}
+                              href={child.href}
+                              passHref
+                              style={{ textDecoration: "none", color: "inherit" }}
+                            >
+                              <ListItem disablePadding sx={{ display: "block" }}>
+                                <ListItemButton
+                                  selected={isChildActive}
+                                  sx={{
+                                    minHeight: 40,
+                                    justifyContent: "initial",
+                                    pl: 4.5,
+                                    pr: 2.5,
+                                    mx: 1,
+                                    borderRadius: 2,
+                                    mb: 0.5,
+                                  }}
+                                >
+                                  <ListItemIcon
+                                    sx={{
+                                      minWidth: 0,
+                                      mr: 1.5,
+                                      justifyContent: "center",
+                                      color: isChildActive ? "primary.main" : "text.secondary",
+                                      "& svg": { fontSize: 18 },
+                                    }}
+                                  >
+                                    {child.icon}
+                                  </ListItemIcon>
+                                  <ListItemText
+                                    primary={child.text}
+                                    sx={{
+                                      "& .MuiListItemText-primary": {
+                                        fontSize: "0.8125rem",
+                                        fontWeight: isChildActive ? 600 : 400,
+                                        color: isChildActive ? "text.primary" : "text.secondary",
+                                      },
+                                    }}
+                                  />
+                                </ListItemButton>
+                              </ListItem>
+                            </Link>
+                          );
+                        })}
+                      </List>
+                    </Collapse>
+                  </React.Fragment>
+                );
+              }
+
+              // ── Item biasa (tanpa children) ──
               const isActive = pathname === item.href;
               return (
                 <Link
