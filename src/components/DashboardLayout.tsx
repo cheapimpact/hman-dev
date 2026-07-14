@@ -39,6 +39,8 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
+import BuildIcon from "@mui/icons-material/Build";
+import HistoryEduIcon from "@mui/icons-material/HistoryEdu";
 import Collapse from "@mui/material/Collapse";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -143,12 +145,13 @@ const menuItems: MenuItem[] = [
     children: [
       { text: "Dashboard Pelatihan", icon: <FitnessCenterIcon />, href: "/dashboard/p1" },
       { text: "Dashboard Pendidikan", icon: <MenuBookIcon />, href: "/dashboard/p1/pendidikan" },
+      { text: "Riwayat Diklat", icon: <HistoryEduIcon />, href: "/dashboard/diklat/riwayat" },
     ],
   },
   { text: "Dashboard P2", icon: <AnalyticsIcon />, href: "/dashboard/p2" },
   { text: "Dashboard JF", icon: <DescriptionIcon />, href: "/dashboard/jf" },
-  { text: "Diklat", icon: <SchoolIcon />, href: "/dashboard/jf" },
   // { text: "MonevIbadah", icon: <MosqueIcon />, href: "/dashboard/monev-ibadah" },
+  { text: "Tools", icon: <BuildIcon />, href: "/tools" },
 ];
 
 // ─── OPTIONS MENU (user profile) ─────────────────────────────────────────────
