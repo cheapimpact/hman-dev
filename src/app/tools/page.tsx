@@ -72,6 +72,92 @@ function getIdOrg(kodeOrganisasi: string, esl3: string): string {
   return kodeOrganisasi.slice(0, takeLen);
 }
 
+// ─── CLIENT-SIDE KEMENKEU API ────────────────────────────────────────────────
+const API_GATEWAY_KEY = "8dd3f3bf-425b-4ab5-a9d6-0ae8212c8fc0";
+
+async function fetchPegawaiByNip(
+  nip: string,
+  bearerToken: string
+): Promise<PegawaiResult> {
+  const errorResult = (msg: string): PegawaiResult => ({
+    idPegawai: msg, nama: msg, nip,
+    pangkat: "", golongan: "", esl1: "", esl2: "", esl3: "", esl4: "",
+    kodeOrganisasi: "", kodeIndukOrganisasi: "", kodeSatker: "",
+    status: "error", message: msg,
+  });
+
+  const headers: Record<string, string> = {
+    Accept: "application/json, text/plain, */*",
+    Authorization: bearerToken,
+    "x-Gateway-APIKey": API_GATEWAY_KEY,
+  };
+
+  try {
+    const searchUrl = new URL(
+      "https://service.kemenkeu.go.id/hris2/profil/api/Profile/GetAllPegawai"
+    );
+    searchUrl.searchParams.set("page", "1");
+    searchUrl.searchParams.set("pageSize", "1");
+    searchUrl.searchParams.set("select", "idPegawai,nip18");
+    searchUrl.searchParams.set("Filters", `nama|nip18@=*${nip}`);
+
+    const searchRes = await fetch(searchUrl.toString(), {
+      headers,
+      signal: AbortSignal.timeout(20000),
+    });
+
+    if (searchRes.status === 401) return errorResult("Token Kedaluwarsa");
+    if (!searchRes.ok) return errorResult(`Err Search: ${searchRes.status}`);
+
+    const searchData = await searchRes.json();
+    if (!searchData?.data?.length) return errorResult("Tidak Ditemukan");
+
+    const pegawai = searchData.data[0];
+    const idPegawai = pegawai?.idPegawai;
+    const nipHasil = pegawai?.nip18 ?? "NIP Tdk Ada";
+
+    if (!idPegawai) return { ...errorResult("ID Tdk Ada"), nip: nipHasil };
+
+    const profilRes = await fetch(
+      `https://service.kemenkeu.go.id/hris2/profil/api/Profile/GetBasicProfilById/${idPegawai}`,
+      { headers, signal: AbortSignal.timeout(20000) }
+    );
+
+    if (!profilRes.ok) return errorResult(`Err Profil: ${profilRes.status}`);
+
+    const profilData = await profilRes.json();
+    const data = profilData?.data ?? {};
+    const jabatanList: Record<string, string>[] = data?.jabatan ?? [];
+    const nama: string = data?.nama ?? "";
+    const kodeSatker: string = data?.kdSatker ?? "";
+    const golongan: string = profilData?.golongan ?? "";
+    const namaPangkat: string = data?.pangkat?.namaPangkat ?? "";
+    const kodeGolongan: string = data?.pangkat?.kodeGolongan ?? "";
+    const pangkat = `${namaPangkat} - ${kodeGolongan}`;
+
+    if (jabatanList.length > 0) {
+      const jabatan = jabatanList[0];
+      return {
+        idPegawai, nama, nip: nipHasil, pangkat, golongan,
+        esl1: jabatan.esl1 ?? "", esl2: jabatan.esl2 ?? "",
+        esl3: jabatan.esl3 ?? "", esl4: jabatan.esl4 ?? "",
+        kodeOrganisasi: jabatan.kodeOrganisasi ?? "",
+        kodeIndukOrganisasi: jabatan.kodeIndukOrganisasi ?? "",
+        kodeSatker, status: "success",
+      };
+    }
+    return {
+      idPegawai, nama, nip: nipHasil, pangkat, golongan,
+      esl1: "Jabatan Tdk Ada", esl2: "", esl3: "", esl4: "",
+      kodeOrganisasi: "", kodeIndukOrganisasi: "", kodeSatker: "",
+      status: "success",
+    };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return errorResult(`[ERR] ${msg}`);
+  }
+}
+
 interface LogEntry {
   time: string;
   message: string;
@@ -323,7 +409,7 @@ function TabGetInfoNIP({
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [results, setResults] = React.useState<PegawaiResult[]>([]);
-  const [concurrency, setConcurrency] = React.useState(3);
+  const [concurrency, setConcurrency] = React.useState(5);
 
   const handleProcess = async () => {
     if (!token.trim()) {
@@ -353,71 +439,39 @@ function TabGetInfoNIP({
 
       const nipList: string[] = rows.map((r) => String(r["NIP"]));
       log(`✅ Ditemukan ${nipList.length} NIP untuk diproses.`, "success");
-
-      // Split into chunks of 10
-      const CHUNK = 10;
-      const chunks: string[][] = [];
-      for (let i = 0; i < nipList.length; i += CHUNK) {
-        chunks.push(nipList.slice(i, i + CHUNK));
-      }
-
       log(
-        `⚡ Memproses ${chunks.length} batch dengan konkurensi ${concurrency}x...`,
+        `🌐 Fetch langsung dari browser (${concurrency} worker paralel)...`,
         "info"
       );
 
-      const fetchChunk = async (
-        chunk: string[],
-        batchIndex: number
-      ): Promise<PegawaiResult[]> => {
-        const start = batchIndex * CHUNK + 1;
-        const end = Math.min(start + CHUNK - 1, nipList.length);
-        log(`🔄 Batch ${batchIndex + 1}: NIP ${start}–${end}`);
-
-        const res = await fetch("/api/tools/get-info-nip", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nipList: chunk, bearerToken: token.trim() }),
-        });
-        const data = await res.json();
-
-        if (!res.ok) {
-          log(`❌ Batch ${batchIndex + 1} error: ${data.error}`, "error");
-          return [];
-        }
-        return data.results as PegawaiResult[];
-      };
-
-      // Controlled concurrency: run `concurrency` chunks in parallel per wave
-      const allResults: PegawaiResult[] = new Array(chunks.length * CHUNK);
+      // Worker pool: `concurrency` workers share a shared index pointer
+      const results: PegawaiResult[] = new Array(nipList.length);
+      let idx = 0;
       let completedNIP = 0;
-      let hasError = false;
+      const bearerToken = token.trim();
 
-      for (let i = 0; i < chunks.length; i += concurrency) {
-        if (hasError) break;
-        const wave = chunks.slice(i, i + concurrency);
-
-        const waveResults = await Promise.all(
-          wave.map((chunk, j) => fetchChunk(chunk, i + j))
-        );
-
-        for (const batchResult of waveResults) {
-          if (batchResult.length === 0 && wave.length > 0) {
-            hasError = true;
-          }
-          for (const item of batchResult) {
-            allResults[completedNIP++] = item;
+      const workers = Array.from({ length: concurrency }, async () => {
+        while (idx < nipList.length) {
+          const i = idx++;
+          const nip = nipList[i];
+          results[i] = await fetchPegawaiByNip(nip, bearerToken);
+          completedNIP++;
+          setProgress(Math.round((completedNIP / nipList.length) * 100));
+          if (results[i].status === "error") {
+            log(`❌ [${completedNIP}/${nipList.length}] ${nip} → ${results[i].message}`, "error");
+          } else {
+            log(`✅ [${completedNIP}/${nipList.length}] ${nip} → ${results[i].nama}`, "success");
           }
         }
+      });
 
-        setProgress(Math.round((completedNIP / nipList.length) * 100));
-      }
+      await Promise.all(workers);
 
-      const finalResults = allResults.filter(Boolean);
+      const finalResults = results.filter(Boolean);
       setResults(finalResults);
       const successCount = finalResults.filter((r) => r.status === "success").length;
       log(
-        `✅ Selesai! ${successCount}/${finalResults.length} NIP berhasil diambil.`,
+        `🏁 Selesai! ${successCount}/${finalResults.length} NIP berhasil diambil.`,
         "success"
       );
     } catch (err: unknown) {
@@ -517,7 +571,7 @@ function TabGetInfoNIP({
             <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
               Konkurensi:
             </Typography>
-            {[1, 2, 3, 5].map((n) => (
+            {[3, 5, 10, 20].map((n) => (
               <Chip
                 key={n}
                 label={`${n}x`}
