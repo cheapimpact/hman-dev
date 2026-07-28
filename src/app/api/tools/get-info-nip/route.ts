@@ -144,7 +144,12 @@ async function getInfoPegawai(
     }
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    return errorResult(`Error Koneksi: ${msg}`);
+    const code = (err as NodeJS.ErrnoException)?.code ?? "NO_CODE";
+    const cause = (err as NodeJS.ErrnoException)?.cause;
+    const causeMsg =
+      cause instanceof Error ? cause.message : cause ? String(cause) : null;
+    const detail = causeMsg ? ` | cause: ${causeMsg}` : "";
+    return errorResult(`[${code}] ${msg}${detail}`);
   }
 }
 
