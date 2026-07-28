@@ -751,29 +751,38 @@ function TabPostGroup({
       log(`✅ Membaca ${idList.length} data dari file Excel.`, "success");
       log(`🚀 Mengirim data untuk grup '${groupName}' dengan ${idList.length} item...`);
 
-      const res = await fetch("/api/tools/post-group", {
+      // Fetch langsung dari browser ke Kemenkeu (bypass Vercel server)
+      const payload = { Nama: groupName.trim(), [tabConfig.payloadKey]: idList };
+      const res = await fetch(tabConfig.apiUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bearerToken: token.trim(),
-          groupName: groupName.trim(),
-          idList,
-          apiUrl: tabConfig.apiUrl,
-          payloadKey: tabConfig.payloadKey,
-        }),
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json",
+          Authorization: token.trim(),
+          "x-Gateway-APIKey": API_GATEWAY_KEY,
+          roleId: "5",
+          unitId: "17086",
+          lat: "-6.2053671",
+          long: "106.876853",
+        },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(30000),
       });
 
-      const data = await res.json();
-      setLastResponse(JSON.stringify(data, null, 2));
+      const responseText = await res.text();
+      let responseData: unknown;
+      try { responseData = JSON.parse(responseText); } catch { responseData = responseText; }
 
-      if (res.ok && data.success) {
+      setLastResponse(JSON.stringify(responseData, null, 2));
+
+      if (res.status === 200 || res.status === 201) {
         setResponseStatus("success");
         log(`✅ SUKSES! Grup '${groupName}' berhasil dikirim.`, "success");
-        log(`Respon: ${JSON.stringify(data.data, null, 2)}`);
+        log(`Respon: ${JSON.stringify(responseData, null, 2)}`);
       } else {
         setResponseStatus("error");
-        log(`❌ GAGAL! Status: ${data.status ?? res.status}`, "error");
-        log(`Detail: ${JSON.stringify(data.data ?? data.error)}`);
+        log(`❌ GAGAL! Status: ${res.status}`, "error");
+        log(`Detail: ${JSON.stringify(responseData)}`);
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
