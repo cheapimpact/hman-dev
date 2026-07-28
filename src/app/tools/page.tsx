@@ -58,6 +58,20 @@ interface PegawaiResult {
   message?: string;
 }
 
+// ─── IDORG HELPER ─────────────────────────────────────────────────────────────
+// Logic:
+//   Kata pertama esl3 adalah "Bagian", "Bidang", "Subdirektorat", atau esl3 kosong
+//   → ambil 6 digit pertama dari kodeOrganisasi
+//   Selainnya → ambil 8 digit pertama
+function getIdOrg(kodeOrganisasi: string, esl3: string): string {
+  if (!kodeOrganisasi) return "";
+  const firstWord = esl3.trim().split(/\s+/)[0] ?? "";
+  const ENAM_DIGIT_KEYWORDS = ["Bagian", "Bidang", "Subdirektorat"];
+  const takeLen =
+    !firstWord || ENAM_DIGIT_KEYWORDS.includes(firstWord) ? 6 : 8;
+  return kodeOrganisasi.slice(0, takeLen);
+}
+
 interface LogEntry {
   time: string;
   message: string;
@@ -309,6 +323,7 @@ function TabGetInfoNIP({
   const [loading, setLoading] = React.useState(false);
   const [progress, setProgress] = React.useState(0);
   const [results, setResults] = React.useState<PegawaiResult[]>([]);
+  const [concurrency, setConcurrency] = React.useState(3);
 
   const handleProcess = async () => {
     if (!token.trim()) {
@@ -339,13 +354,25 @@ function TabGetInfoNIP({
       const nipList: string[] = rows.map((r) => String(r["NIP"]));
       log(`✅ Ditemukan ${nipList.length} NIP untuk diproses.`, "success");
 
-      // Process in chunks of 10 to show progress
+      // Split into chunks of 10
       const CHUNK = 10;
-      const allResults: PegawaiResult[] = [];
-
+      const chunks: string[][] = [];
       for (let i = 0; i < nipList.length; i += CHUNK) {
-        const chunk = nipList.slice(i, i + CHUNK);
-        log(`🔄 Memproses NIP ${i + 1}–${Math.min(i + CHUNK, nipList.length)}...`);
+        chunks.push(nipList.slice(i, i + CHUNK));
+      }
+
+      log(
+        `⚡ Memproses ${chunks.length} batch dengan konkurensi ${concurrency}x...`,
+        "info"
+      );
+
+      const fetchChunk = async (
+        chunk: string[],
+        batchIndex: number
+      ): Promise<PegawaiResult[]> => {
+        const start = batchIndex * CHUNK + 1;
+        const end = Math.min(start + CHUNK - 1, nipList.length);
+        log(`🔄 Batch ${batchIndex + 1}: NIP ${start}–${end}`);
 
         const res = await fetch("/api/tools/get-info-nip", {
           method: "POST",
@@ -355,18 +382,42 @@ function TabGetInfoNIP({
         const data = await res.json();
 
         if (!res.ok) {
-          log(`❌ Error: ${data.error}`, "error");
-          break;
+          log(`❌ Batch ${batchIndex + 1} error: ${data.error}`, "error");
+          return [];
+        }
+        return data.results as PegawaiResult[];
+      };
+
+      // Controlled concurrency: run `concurrency` chunks in parallel per wave
+      const allResults: PegawaiResult[] = new Array(chunks.length * CHUNK);
+      let completedNIP = 0;
+      let hasError = false;
+
+      for (let i = 0; i < chunks.length; i += concurrency) {
+        if (hasError) break;
+        const wave = chunks.slice(i, i + concurrency);
+
+        const waveResults = await Promise.all(
+          wave.map((chunk, j) => fetchChunk(chunk, i + j))
+        );
+
+        for (const batchResult of waveResults) {
+          if (batchResult.length === 0 && wave.length > 0) {
+            hasError = true;
+          }
+          for (const item of batchResult) {
+            allResults[completedNIP++] = item;
+          }
         }
 
-        allResults.push(...data.results);
-        setProgress(Math.round((allResults.length / nipList.length) * 100));
+        setProgress(Math.round((completedNIP / nipList.length) * 100));
       }
 
-      setResults(allResults);
-      const successCount = allResults.filter((r) => r.status === "success").length;
+      const finalResults = allResults.filter(Boolean);
+      setResults(finalResults);
+      const successCount = finalResults.filter((r) => r.status === "success").length;
       log(
-        `✅ Selesai! ${successCount}/${allResults.length} NIP berhasil diambil.`,
+        `✅ Selesai! ${successCount}/${finalResults.length} NIP berhasil diambil.`,
         "success"
       );
     } catch (err: unknown) {
@@ -391,6 +442,7 @@ function TabGetInfoNIP({
       "Es. 3": r.esl3,
       "Es. 4": r.esl4,
       "Kode Organisasi": r.kodeOrganisasi,
+      "IDORG": getIdOrg(r.kodeOrganisasi, r.esl3),
       "Kode Induk Organisasi": r.kodeIndukOrganisasi,
       "Kode Satker": r.kodeSatker,
     }));
@@ -412,6 +464,7 @@ function TabGetInfoNIP({
     "Es. 3",
     "Es. 4",
     "Kode Org",
+    "IDORG",
     "Kode Induk",
     "Satker",
   ];
@@ -450,7 +503,7 @@ function TabGetInfoNIP({
         )}
 
         {/* Action Button */}
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
           <Button
             variant="contained"
             startIcon={<RocketLaunchIcon />}
@@ -460,6 +513,33 @@ function TabGetInfoNIP({
           >
             {loading ? "Memproses..." : "Mulai Proses"}
           </Button>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+              Konkurensi:
+            </Typography>
+            {[1, 2, 3, 5].map((n) => (
+              <Chip
+                key={n}
+                label={`${n}x`}
+                size="small"
+                clickable
+                onClick={() => setConcurrency(n)}
+                color={concurrency === n ? "primary" : "default"}
+                variant={concurrency === n ? "filled" : "outlined"}
+                disabled={loading}
+                sx={{ fontWeight: 600, fontSize: "0.75rem" }}
+              />
+            ))}
+            <Tooltip title="Jumlah batch yang diproses secara paralel. Nilai lebih tinggi = lebih cepat, tapi berisiko rate limit.">
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ cursor: "help", borderBottom: "1px dashed", ml: 0.5 }}
+              >
+                ⓘ
+              </Typography>
+            </Tooltip>
+          </Stack>
           {results.length > 0 && (
             <Button
               variant="outlined"
@@ -521,6 +601,15 @@ function TabGetInfoNIP({
                       <TableCell>{row.esl3}</TableCell>
                       <TableCell>{row.esl4}</TableCell>
                       <TableCell>{row.kodeOrganisasi}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={getIdOrg(row.kodeOrganisasi, row.esl3) || "-"}
+                          size="small"
+                          color="primary"
+                          variant="outlined"
+                          sx={{ fontFamily: "monospace", fontSize: "0.75rem", fontWeight: 700 }}
+                        />
+                      </TableCell>
                       <TableCell>{row.kodeIndukOrganisasi}</TableCell>
                       <TableCell>{row.kodeSatker}</TableCell>
                     </TableRow>
